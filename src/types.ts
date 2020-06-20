@@ -3,19 +3,6 @@ export enum ListView {
   Fish = 'fish',
 }
 
-export enum SortDirection {
-  Ascending = 'ASC',
-  Descending = 'DESC',
-  NotApplicable = 'NOT_APPLICABLE',
-}
-
-// export enum SortField {
-//   Id = 'id',
-//   Name = 'name',
-//   Price = 'price',
-//   Rarity = 'rarity',
-// }
-
 export enum SortField {
   None = 'None',
   NameAZ = 'Name (A - Z)',

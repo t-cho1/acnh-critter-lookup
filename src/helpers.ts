@@ -49,7 +49,7 @@ export function isSubsequence(a: string, b: string): boolean {
   return j === m
 }
 
-export function sortAndFilterCreatures(
+function sortAndFilterCreatures(
   creatures: any[],
   sortField: SortField,
   searchKeyword: string,
@@ -66,7 +66,7 @@ export function sortAndFilterCreatures(
   return filtered
 }
 
-export function sortBySortField(creatures: any[], sortField: SortField): ICreature[] {
+function sortBySortField(creatures: any[], sortField: SortField): ICreature[] {
   const newCreatures = [...creatures]
   switch (sortField) {
     case SortField.None:
@@ -98,15 +98,31 @@ export function sortBySortField(creatures: any[], sortField: SortField): ICreatu
   }
 }
 
-export function filterBySearchKeyword(creatures: ICreature[], keyword: string): ICreature[] {
+function filterBySearchKeyword(creatures: ICreature[], keyword: string): ICreature[] {
   return creatures.filter((creature: ICreature) =>
     isSubsequence(creature.name.toLowerCase(), keyword.toLowerCase())
   )
 }
 
-export function filterByLocation(creatures: ICreature[], location: Location): ICreature[] {
+function filterByLocation(creatures: ICreature[], location: Location): ICreature[] {
   if (location === BugLocation.None || location === FishLocation.None) {
     return creatures
   }
   return creatures.filter((creature: ICreature) => creature.availability.location === location)
+}
+
+export function getCreatureUpdates(
+  listView: ListView,
+  sortField: SortField,
+  searchInput: string,
+  location: Location
+) {
+  return {
+    [listView]: sortAndFilterCreatures(
+      originalCreatureMap[listView],
+      sortField,
+      searchInput,
+      location
+    ),
+  }
 }

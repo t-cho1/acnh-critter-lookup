@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { ListView, SortField, ICreature, BugLocation, FishLocation, Location } from './types'
-import { originalBugs, originalFish, originalCreatureMap, sortAndFilterCreatures } from './helpers'
+import { originalCreatureMap, getCreatureUpdates } from './helpers'
 
 import SearchField from './SearchInput'
 import Views from './Views'
@@ -67,8 +67,8 @@ export default class App extends React.Component<{}, IState> {
   }
 
   initialState = Object.freeze({
-    bugs: originalBugs,
-    fish: originalFish,
+    bugs: originalCreatureMap[ListView.Bugs],
+    fish: originalCreatureMap[ListView.Fish],
     searchInput: '',
     listView: ListView.Bugs,
     location: BugLocation.None,
@@ -89,14 +89,9 @@ export default class App extends React.Component<{}, IState> {
 
   handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value: searchInput } = event.target
-    const { location, sortField } = this.state
+    const { listView, location, sortField } = this.state
     this.setState({
-      [this.state.listView]: sortAndFilterCreatures(
-        originalCreatureMap[this.state.listView],
-        sortField,
-        searchInput,
-        location
-      ),
+      ...getCreatureUpdates(listView, sortField, searchInput, location),
       searchInput,
       ...{},
     })
@@ -105,14 +100,9 @@ export default class App extends React.Component<{}, IState> {
   handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
     const location = value as Location
-    const { searchInput, sortField } = this.state
+    const { listView, searchInput, sortField } = this.state
     this.setState({
-      [this.state.listView]: sortAndFilterCreatures(
-        originalCreatureMap[this.state.listView],
-        sortField,
-        searchInput,
-        location
-      ),
+      ...getCreatureUpdates(listView, sortField, searchInput, location),
       location,
       ...{},
     })
@@ -120,15 +110,10 @@ export default class App extends React.Component<{}, IState> {
 
   handleSortFieldChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
-    const { location, searchInput } = this.state
+    const { listView, location, searchInput } = this.state
     const sortField = value as SortField
     this.setState({
-      [this.state.listView]: sortAndFilterCreatures(
-        originalCreatureMap[this.state.listView],
-        sortField,
-        searchInput,
-        location
-      ),
+      ...getCreatureUpdates(listView, sortField, searchInput, location),
       sortField,
       ...{},
     })
