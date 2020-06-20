@@ -9,14 +9,77 @@ export enum SortDirection {
   NotApplicable = 'NOT_APPLICABLE',
 }
 
+// export enum SortField {
+//   Id = 'id',
+//   Name = 'name',
+//   Price = 'price',
+//   Rarity = 'rarity',
+// }
+
 export enum SortField {
-  Id = 'id',
-  Name = 'name',
-  Price = 'price',
+  None = 'None',
+  NameAZ = 'Name (A - Z)',
+  NameZA = 'Name (Z - A)',
+  PriceLowHigh = 'Price (Low - High)',
+  PriceHighLow = 'Price (High - Low)',
+  RarityLessMore = 'Rarity (Less - More)',
+  RarityMoreLess = 'Rarity (More - Less)'
+}
+
+export enum BugLocation {
+  None = 'None',
+  Flying = 'Flying',
+  FlyingHybridFlowers = 'Flying near hybrid flowers',
+  FlyingLight = 'Flying by light',
+  Trees = 'On trees',
+  Ground = 'On the ground',
+  Flowers = 'On flowers',
+  WhiteFlowers = 'On white flowers',
+  ShakingTrees = 'Shaking trees',
+  Underground = 'Underground',
+  PondsAndRivers = 'On ponds and rivers',
+  TreeStumps = 'On tree stumps',
+  PalmTrees = 'On palm trees',
+  UnderTrees = 'Under trees',
+  RottenFood = 'On rotten food',
+  Beach = 'On the beach',
+  BeachRocks = 'On beach rocks',
+  Trash = 'Near trash',
+  Villagers = 'On villagers',
+  RocksRain = 'On rocks (when raining)',
+  HittingRocks = 'Hitting rocks',
+  Empty = '',
+}
+
+export enum FishLocation {
+  None = 'None',
+  River = 'River',
+  Pond = 'Pond',
+  RiverClifftop = 'River (Clifftop)',
+  RiverClifftopAndPond = 'River (Clifftop) & Pond',
+  RiverMouth = 'River (Mouth)',
+  Sea = 'Sea',
+  Pier = 'Pier',
+  SeaWhenRainingOrSnowing = 'Sea (when raining or snowing)',
+}
+
+export enum Rarity {
+  Common = 1,
+  Uncommon,
+  Rare,
+  'Ultra-rare',
+}
+
+export type Location = BugLocation | FishLocation
+
+interface Availability {
+  location: Location
+  rarity: Rarity
 }
 
 export interface ICreature {
   id: number
-  name: { [key: string]: string }
-  price: string
+  name: string
+  price: number
+  availability: Availability
 }

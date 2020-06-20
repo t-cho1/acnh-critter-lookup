@@ -1,38 +1,45 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import bugs from './bugs.json'
-import fish from './fish.json'
+import {
+  ListView,
+  SortField,
+  ICreature,
+  BugLocation,
+  FishLocation,
+  Location,
+} from './types'
+import {
+  originalCreatureMap,
+  sortAndFilterCreatures,
+} from './helpers'
 
-import { ListView, SortDirection, SortField } from './types'
-import { compareString, isSubsequence } from './helpers'
-
-import SearchField from './SearchField'
+import SearchField from './SearchInput'
 import Views from './Views'
-import CreaturesTable from './CreaturesTable'
 
 import './App.css'
 
 interface IState {
   // data
-  bugs: object
-  fish: object
+  bugs: ICreature[]
+  fish: ICreature[]
+
+  // search
+  searchInput: string
 
   // list view
   listView: ListView
 
-  // search
-  searchInput: String
+  // location
+  location: Location
 
-  // sort directions
-  id: SortDirection
-  name: SortDirection
-  price: SortDirection
+  // sort field
+  sortField: SortField
 }
 
 const AppContainer = styled.div`
   width: 100%;
-  max-width: 800px;
+  max-width: max(70vw, 800px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -42,21 +49,41 @@ const AppContainer = styled.div`
   }
 `
 
+const Filters = styled.div`
+  margin-bottom: 24px;
+`
+
+const CreatureName = styled.h1`
+  margin: 0;
+  text-transform: capitalize;
+`
+
+const CreatureCard = styled.div`
+  border: 1px solid;
+  margin-bottom: 16px;
+  padding: 8px;
+  border-radius: 2px;
+  box-shadow: 1px 1px #888;
+`
+
+const CreatureInfo = styled.span`
+  font-weight: bold;
+`
+
 export default class App extends React.Component<{}, IState> {
   constructor(props: any) {
     super(props)
     this.state = {
-      bugs,
-      fish,
-      listView: ListView.Bugs,
+      bugs: originalCreatureMap[ListView.Bugs],
+      fish: originalCreatureMap[ListView.Fish],
       searchInput: '',
-      id: SortDirection.Ascending,
-      name: SortDirection.NotApplicable,
-      price: SortDirection.NotApplicable,
+      listView: ListView.Bugs,
+      location: BugLocation.None,
+      sortField: SortField.None,
     }
   }
 
-  get creatures(): object {
+  get creatures(): any[] {
     return this.state[this.state.listView]
   }
 
@@ -66,93 +93,110 @@ export default class App extends React.Component<{}, IState> {
     })
   }
 
-  search = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.target.value
-    const { listView } = this.state
-
-    if (newValue) {
-      const origCreatures = listView === 'bugs' ? bugs : fish
-      const filtered = Object.entries(origCreatures).filter((creatureEntry) =>
-        isSubsequence(creatureEntry[1].name['name-en'].toLowerCase(), newValue.toLowerCase())
-      )
-      const listUpdate = { [listView]: Object.fromEntries(filtered) }
-      this.setState({
-        ...listUpdate,
-        searchInput: newValue,
-      })
-    } else {
-      switch (listView) {
-        case ListView.Bugs:
-          this.setState({ bugs })
-          break
-        case ListView.Fish:
-          this.setState({ fish })
-          break
-      }
-    }
+  handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value: searchInput } = event.target
+    const { location, sortField } = this.state
+    this.setState({
+      [this.state.listView]: sortAndFilterCreatures(
+        originalCreatureMap[this.state.listView],
+        sortField,
+        searchInput,
+        location
+      ),
+      searchInput,
+      ...{},
+    })
   }
 
-  sort = (field: SortField) => {
-    const shouldSortAscending =
-      this.state[field] === SortDirection.Descending ||
-      this.state[field] === SortDirection.NotApplicable
-
-    let sorted = []
-    let stateUpdates = {}
-    switch (field) {
-      case SortField.Id:
-        sorted = Object.entries(this.creatures).sort((a: any, b: any) =>
-          shouldSortAscending ? a[1].id - b[1].id : b[1].id - a[1].id
-        )
-        stateUpdates = {
-          id: shouldSortAscending ? SortDirection.Ascending : SortDirection.Descending,
-          name: SortDirection.NotApplicable,
-          price: SortDirection.NotApplicable,
-        }
-        break
-      case SortField.Name:
-        sorted = Object.entries(this.creatures).sort((a: any, b: any) =>
-          shouldSortAscending ? compareString(a[0], b[0]) : compareString(b[0], a[0])
-        )
-        stateUpdates = {
-          id: SortDirection.NotApplicable,
-          name: shouldSortAscending ? SortDirection.Ascending : SortDirection.Descending,
-          price: SortDirection.NotApplicable,
-        }
-        break
-      case SortField.Price:
-        sorted = Object.entries(this.creatures).sort((a: any, b: any) =>
-          shouldSortAscending ? a[1].price - b[1].price : b[1].price - a[1].price
-        )
-        stateUpdates = {
-          id: SortDirection.NotApplicable,
-          name: SortDirection.NotApplicable,
-          price: shouldSortAscending ? SortDirection.Ascending : SortDirection.Descending,
-        }
-    }
-
+  handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target
+    const location = value as Location
+    const { searchInput, sortField } = this.state
     this.setState({
-      [this.state.listView]: Object.fromEntries(sorted),
-      ...stateUpdates,
+      [this.state.listView]: sortAndFilterCreatures(
+        originalCreatureMap[this.state.listView],
+        sortField,
+        searchInput,
+        location
+      ),
+      location,
+      ...{},
+    })
+  }
+
+  handleSortFieldChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target
+    const { location, searchInput } = this.state
+    const sortField = value as SortField
+    this.setState({
+      [this.state.listView]: sortAndFilterCreatures(
+        originalCreatureMap[this.state.listView],
+        sortField,
+        searchInput,
+        location
+      ),
+      sortField,
+      ...{},
     })
   }
 
   render() {
-    const { id, listView, name, price } = this.state
+    const { listView } = this.state
+    const locations: Location[] =
+      listView === ListView.Bugs ? Object.values(BugLocation) : Object.values(FishLocation)
 
     return (
       <AppContainer>
-        <div>
-          <SearchField search={this.search} />
+        <Filters>
+          <SearchField search={this.handleSearchInputChange} />
           <Views changeListView={this.changeListView} currentListView={listView} />
+          <div>
+            <span>Location: </span>
+            <select onChange={this.handleLocationChange}>
+              {locations.map((location: Location) => (
+                <option key={location}>{location}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <span>Sort: </span>
+            <select onChange={this.handleSortFieldChange}>
+              {Object.values(SortField).map((sortField) => (
+                <option key={sortField}>{sortField}</option>
+              ))}
+            </select>
+          </div>
+        </Filters>
+        <div>
+          {this.creatures.map((creature) => (
+            <CreatureCard key={creature.id}>
+              <CreatureName>{creature.name}</CreatureName>
+              <div>
+                <div>
+                  <span>Price: </span>
+                  <CreatureInfo>{creature.price}</CreatureInfo>
+                </div>
+                <div>
+                  <span>Location: </span>
+                  <CreatureInfo>{creature.availability.location}</CreatureInfo>
+                </div>
+                <div>
+                  <span>Rarity: </span>
+                  <CreatureInfo>{creature.availability.rarity}</CreatureInfo>
+                </div>
+              </div>
+            </CreatureCard>
+          ))}
         </div>
-        <CreaturesTable
+        {/* <CreaturesTable
           creatures={Object.values(this.creatures)}
+          listView={listView}
           sort={this.sort}
           idSortDirection={id}
           nameSortDirection={name}
           priceSortDirection={price}
-        />
+          raritySortDirection={rarity}
+        /> */}
       </AppContainer>
     )
   }

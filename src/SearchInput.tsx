@@ -5,16 +5,16 @@ interface IProps {
   search: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-const SearchFieldContainer = styled.div`
+const SearchInputContainer = styled.div`
   display: flex;
   white-space: pre;
 `
 
-export default function SearchField({ search }: IProps) {
+export default function SearchInput({ search }: IProps) {
   return (
-    <SearchFieldContainer>
-      <label>Search: </label>
+    <SearchInputContainer>
+      <span>Search: </span>
       <input type="text" onChange={search} />
-    </SearchFieldContainer>
+    </SearchInputContainer>
   )
 }

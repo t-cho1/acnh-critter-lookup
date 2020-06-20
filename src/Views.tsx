@@ -16,7 +16,7 @@ const ViewsContainer = styled.div`
 export default function Views({ changeListView, currentListView }: IProps) {
   return (
     <ViewsContainer>
-      <p>View: </p>
+      <span>View: </span>
       <div>
         <input
           type="radio"

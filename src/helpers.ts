@@ -1,5 +1,37 @@
+import bugs from './bugs.json'
+import fish from './fish.json'
+
+import {
+  ListView,
+  SortField,
+  BugLocation,
+  FishLocation,
+  Location,
+  Rarity,
+  ICreature,
+} from './types'
+
+const originalBugs: ICreature[] = convertCreatureJsonToInterface(bugs)
+const originalFish: ICreature[] = convertCreatureJsonToInterface(fish)
+export const originalCreatureMap = Object.freeze({
+  [ListView.Bugs]: originalBugs,
+  [ListView.Fish]: originalFish,
+})
+
+export function convertCreatureJsonToInterface(creatureJson: any) {
+  return Object.values(creatureJson).map(({ id, name, price, availability }: any) => ({
+    id,
+    name: name['name-USen'],
+    price,
+    availability: {
+      location: availability.location,
+      rarity: availability.rarity,
+    },
+  }))
+}
+
 export function compareString(a: string, b: string): number {
-  return a > b ? 1 : -1
+  return a.toLowerCase() > b.toLowerCase() ? 1 : -1
 }
 
 /**
@@ -15,4 +47,66 @@ export function isSubsequence(a: string, b: string): boolean {
     }
   }
   return j === m
+}
+
+export function sortAndFilterCreatures(
+  creatures: any[],
+  sortField: SortField,
+  searchKeyword: string,
+  location: Location
+): ICreature[] {
+  console.log(sortField, searchKeyword, location)
+  // sort first
+  const sortedBySortField = sortBySortField(creatures, sortField)
+
+  // then filter by location and keyword
+  let filtered = filterByLocation(sortedBySortField, location)
+  filtered = filterBySearchKeyword(filtered, searchKeyword)
+  // return sortedByLocation
+  return filtered
+  // then search
+}
+
+export function sortBySortField(creatures: any[], sortField: SortField): ICreature[] {
+  switch (sortField) {
+    case SortField.None:
+      return creatures.sort((a: ICreature, b: ICreature) => a.id - b.id)
+
+    case SortField.NameAZ:
+      return creatures.sort((a: ICreature, b: ICreature) => compareString(a.name, b.name))
+
+    case SortField.NameZA:
+      return creatures.sort((a: ICreature, b: ICreature) => compareString(b.name, a.name))
+
+    case SortField.PriceLowHigh:
+      return creatures.sort((a: ICreature, b: ICreature) => a.price - b.price)
+
+    case SortField.PriceHighLow:
+      return creatures.sort((a: ICreature, b: ICreature) => b.price - a.price)
+
+    case SortField.RarityLessMore:
+      return creatures.sort(
+        (a: ICreature, b: ICreature) =>
+          (Rarity as any)[a.availability.rarity] - (Rarity as any)[b.availability.rarity]
+      )
+
+    case SortField.RarityMoreLess:
+      return creatures.sort(
+        (a: ICreature, b: ICreature) =>
+          (Rarity as any)[b.availability.rarity] - (Rarity as any)[a.availability.rarity]
+      )
+  }
+}
+
+export function filterBySearchKeyword(creatures: ICreature[], keyword: string): ICreature[] {
+  return creatures.filter((creature: ICreature) =>
+    isSubsequence(creature.name.toLowerCase(), keyword.toLowerCase())
+  )
+}
+
+export function filterByLocation(creatures: ICreature[], location: Location): ICreature[] {
+  if (location === BugLocation.None || location === FishLocation.None) {
+    return creatures
+  }
+  return creatures.filter((creature: ICreature) => creature.availability.location === location)
 }
