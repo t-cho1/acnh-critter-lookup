@@ -73,13 +73,13 @@ export enum Rarity {
 export type Location = BugLocation | FishLocation
 
 interface Availability {
-  location: Location
-  rarity: Rarity
+  readonly location: Location
+  readonly rarity: Rarity
 }
 
 export interface ICreature {
-  id: number
-  name: string
-  price: number
-  availability: Availability
+  readonly id: number
+  readonly name: string
+  readonly price: number
+  readonly availability: Availability
 }

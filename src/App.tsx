@@ -1,18 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import {
-  ListView,
-  SortField,
-  ICreature,
-  BugLocation,
-  FishLocation,
-  Location,
-} from './types'
-import {
-  originalCreatureMap,
-  sortAndFilterCreatures,
-} from './helpers'
+import { ListView, SortField, ICreature, BugLocation, FishLocation, Location } from './types'
+import { originalBugs, originalFish, originalCreatureMap, sortAndFilterCreatures } from './helpers'
 
 import SearchField from './SearchInput'
 import Views from './Views'
@@ -73,23 +63,27 @@ const CreatureInfo = styled.span`
 export default class App extends React.Component<{}, IState> {
   constructor(props: any) {
     super(props)
-    this.state = {
-      bugs: originalCreatureMap[ListView.Bugs],
-      fish: originalCreatureMap[ListView.Fish],
-      searchInput: '',
-      listView: ListView.Bugs,
-      location: BugLocation.None,
-      sortField: SortField.None,
-    }
+    this.state = this.initialState
   }
 
-  get creatures(): any[] {
+  initialState = Object.freeze({
+    bugs: originalBugs,
+    fish: originalFish,
+    searchInput: '',
+    listView: ListView.Bugs,
+    location: BugLocation.None,
+    sortField: SortField.None,
+  })
+
+  get creatures(): ICreature[] {
     return this.state[this.state.listView]
   }
 
   changeListView = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const listView = event.target.value
     this.setState({
-      listView: event.target.value as ListView,
+      ...this.initialState,
+      listView: listView as ListView,
     })
   }
 
@@ -141,7 +135,7 @@ export default class App extends React.Component<{}, IState> {
   }
 
   render() {
-    const { listView } = this.state
+    const { listView, location, sortField } = this.state
     const locations: Location[] =
       listView === ListView.Bugs ? Object.values(BugLocation) : Object.values(FishLocation)
 
@@ -152,7 +146,7 @@ export default class App extends React.Component<{}, IState> {
           <Views changeListView={this.changeListView} currentListView={listView} />
           <div>
             <span>Location: </span>
-            <select onChange={this.handleLocationChange}>
+            <select value={location} onChange={this.handleLocationChange}>
               {locations.map((location: Location) => (
                 <option key={location}>{location}</option>
               ))}
@@ -160,7 +154,7 @@ export default class App extends React.Component<{}, IState> {
           </div>
           <div>
             <span>Sort: </span>
-            <select onChange={this.handleSortFieldChange}>
+            <select value={sortField} onChange={this.handleSortFieldChange}>
               {Object.values(SortField).map((sortField) => (
                 <option key={sortField}>{sortField}</option>
               ))}
@@ -188,15 +182,6 @@ export default class App extends React.Component<{}, IState> {
             </CreatureCard>
           ))}
         </div>
-        {/* <CreaturesTable
-          creatures={Object.values(this.creatures)}
-          listView={listView}
-          sort={this.sort}
-          idSortDirection={id}
-          nameSortDirection={name}
-          priceSortDirection={price}
-          raritySortDirection={rarity}
-        /> */}
       </AppContainer>
     )
   }

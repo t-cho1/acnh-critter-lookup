@@ -11,8 +11,8 @@ import {
   ICreature,
 } from './types'
 
-const originalBugs: ICreature[] = convertCreatureJsonToInterface(bugs)
-const originalFish: ICreature[] = convertCreatureJsonToInterface(fish)
+export const originalBugs: ICreature[] = convertCreatureJsonToInterface(bugs)
+export const originalFish: ICreature[] = convertCreatureJsonToInterface(fish)
 export const originalCreatureMap = Object.freeze({
   [ListView.Bugs]: originalBugs,
   [ListView.Fish]: originalFish,
@@ -62,36 +62,36 @@ export function sortAndFilterCreatures(
   // then filter by location and keyword
   let filtered = filterByLocation(sortedBySortField, location)
   filtered = filterBySearchKeyword(filtered, searchKeyword)
-  // return sortedByLocation
+
   return filtered
-  // then search
 }
 
 export function sortBySortField(creatures: any[], sortField: SortField): ICreature[] {
+  const newCreatures = [...creatures]
   switch (sortField) {
     case SortField.None:
-      return creatures.sort((a: ICreature, b: ICreature) => a.id - b.id)
+      return newCreatures.sort((a: ICreature, b: ICreature) => a.id - b.id)
 
     case SortField.NameAZ:
-      return creatures.sort((a: ICreature, b: ICreature) => compareString(a.name, b.name))
+      return newCreatures.sort((a: ICreature, b: ICreature) => compareString(a.name, b.name))
 
     case SortField.NameZA:
-      return creatures.sort((a: ICreature, b: ICreature) => compareString(b.name, a.name))
+      return newCreatures.sort((a: ICreature, b: ICreature) => compareString(b.name, a.name))
 
     case SortField.PriceLowHigh:
-      return creatures.sort((a: ICreature, b: ICreature) => a.price - b.price)
+      return newCreatures.sort((a: ICreature, b: ICreature) => a.price - b.price)
 
     case SortField.PriceHighLow:
-      return creatures.sort((a: ICreature, b: ICreature) => b.price - a.price)
+      return newCreatures.sort((a: ICreature, b: ICreature) => b.price - a.price)
 
     case SortField.RarityLessMore:
-      return creatures.sort(
+      return newCreatures.sort(
         (a: ICreature, b: ICreature) =>
           (Rarity as any)[a.availability.rarity] - (Rarity as any)[b.availability.rarity]
       )
 
     case SortField.RarityMoreLess:
-      return creatures.sort(
+      return newCreatures.sort(
         (a: ICreature, b: ICreature) =>
           (Rarity as any)[b.availability.rarity] - (Rarity as any)[a.availability.rarity]
       )
