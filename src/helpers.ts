@@ -7,6 +7,7 @@ import {
   BugLocation,
   FishLocation,
   Location,
+  Time,
   Rarity,
   ICreature,
 } from './types'
@@ -18,7 +19,7 @@ export const originalCreatureMap = Object.freeze({
   [ListView.Fish]: originalFish,
 })
 
-export function convertCreatureJsonToInterface(creatureJson: any) {
+function convertCreatureJsonToInterface(creatureJson: any) {
   return Object.values(creatureJson).map(({ id, name, price, availability }: any) => ({
     id,
     name: name['name-USen'],
@@ -26,6 +27,10 @@ export function convertCreatureJsonToInterface(creatureJson: any) {
     availability: {
       location: availability.location,
       rarity: availability.rarity,
+      time: [...availability['time-array']].sort(),
+      isAllDay: availability.isAllDay,
+      monthNorthern: availability['month-array-northern'],
+      monthSouthern: availability['month-array-southern'],
     },
   }))
 }
@@ -49,18 +54,50 @@ export function isSubsequence(a: string, b: string): boolean {
   return j === m
 }
 
+/**
+ * Convert number to time of day
+ * eg. convertNumberToTime(5) => '5am', convertNumberToTime(18) => '6pm
+ */
+export function convertNumberToTime(n: number): string {
+  // special cases
+  if (n === 0) {
+    return '12am'
+  }
+  if (n === 12) {
+    return '12pm'
+  }
+  const suffix = n < 12 ? 'am' : 'pm'
+  return `${n % 12}${suffix}`
+}
+
+export function getAllTimeString(): string[] {
+  const hours = []
+  for (let i = 0; i < 24; i++) {
+    hours.push(i)
+  }
+  return hours.map((hour: number) => convertNumberToTime(hour))
+}
+
 function sortAndFilterCreatures(
   creatures: any[],
   sortField: SortField,
   searchKeyword: string,
-  location: Location
+  location: Location,
+  startTime: Time,
+  endTime: Time,
+  allDay: boolean
 ): ICreature[] {
-  console.log(sortField, searchKeyword, location)
+  console.log(sortField, searchKeyword, location, startTime, endTime)
   // sort first
   const sortedBySortField = sortBySortField(creatures, sortField)
 
-  // then filter by location and keyword
+  // then filter
   let filtered = filterByLocation(sortedBySortField, location)
+  if (allDay) {
+    filtered = filterByAllDay(filtered)
+  } else {
+    filtered = filterByTime(filtered, startTime, endTime)
+  }
   filtered = filterBySearchKeyword(filtered, searchKeyword)
 
   return filtered
@@ -99,22 +136,43 @@ function sortBySortField(creatures: any[], sortField: SortField): ICreature[] {
 }
 
 function filterBySearchKeyword(creatures: ICreature[], keyword: string): ICreature[] {
-  return creatures.filter((creature: ICreature) =>
-    isSubsequence(creature.name.toLowerCase(), keyword.toLowerCase())
-  )
+  return creatures.filter(({ name }) => isSubsequence(name.toLowerCase(), keyword.toLowerCase()))
 }
 
 function filterByLocation(creatures: ICreature[], location: Location): ICreature[] {
   if (location === BugLocation.None || location === FishLocation.None) {
     return creatures
   }
-  return creatures.filter((creature: ICreature) => creature.availability.location === location)
+  return creatures.filter(
+    ({ availability: { location: creatureLocation } }) => creatureLocation === location
+  )
+}
+
+function filterByTime(
+  creatures: ICreature[],
+  startTime: Time,
+  endTime: Time
+): ICreature[] {
+  if (startTime === null) {
+    return creatures
+  }
+  return creatures.filter(
+    ({ availability: { time } }) =>
+      time[0] <= startTime && (endTime as number) <= time[time.length - 1]
+  )
+}
+
+function filterByAllDay(creatures: ICreature[]) {
+  return creatures.filter(({ availability: { isAllDay } }) => isAllDay)
 }
 
 export function getCreatureUpdates(
   listView: ListView,
   sortField: SortField,
   searchInput: string,
+  startTime: Time,
+  endTime: Time,
+  allDay: boolean,
   location: Location
 ) {
   return {
@@ -122,7 +180,10 @@ export function getCreatureUpdates(
       originalCreatureMap[listView],
       sortField,
       searchInput,
-      location
+      location,
+      startTime,
+      endTime,
+      allDay,
     ),
   }
 }

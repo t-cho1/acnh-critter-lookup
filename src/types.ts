@@ -58,10 +58,15 @@ export enum Rarity {
 }
 
 export type Location = BugLocation | FishLocation
+export type Time = number | null
 
 interface Availability {
   readonly location: Location
   readonly rarity: Rarity
+  readonly time: number[] // starts at 0
+  readonly isAllDay: boolean
+  readonly monthNorthern: number[] // starts at 1
+  readonly monthSouthern: number[] // starts at 1
 }
 
 export interface ICreature {

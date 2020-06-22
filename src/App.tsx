@@ -1,11 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ListView, SortField, ICreature, BugLocation, FishLocation, Location } from './types'
+import { ListView, SortField, ICreature, BugLocation, Location, Time as TimeType } from './types'
 import { originalCreatureMap, getCreatureUpdates } from './helpers'
 
 import SearchField from './SearchInput'
 import Views from './Views'
+import Locations from './Locations'
+import Time from './Time'
+import SortFields from './SortFields'
+import Creatures from './Creatures'
 
 import './App.css'
 
@@ -22,6 +26,11 @@ interface IState {
 
   // location
   location: Location
+
+  // time
+  startTime: TimeType
+  endTime: TimeType
+  allDay: boolean
 
   // sort field
   sortField: SortField
@@ -43,37 +52,23 @@ const Filters = styled.div`
   margin-bottom: 24px;
 `
 
-const CreatureName = styled.h1`
-  margin: 0;
-  text-transform: capitalize;
-`
-
-const CreatureCard = styled.div`
-  border: 1px solid;
-  margin-bottom: 16px;
-  padding: 8px;
-  border-radius: 2px;
-  box-shadow: 1px 1px #888;
-`
-
-const CreatureInfo = styled.span`
-  font-weight: bold;
-`
+const initialState: IState = Object.freeze({
+  bugs: originalCreatureMap[ListView.Bugs],
+  fish: originalCreatureMap[ListView.Fish],
+  searchInput: '',
+  listView: ListView.Bugs,
+  location: BugLocation.None,
+  startTime: null,
+  endTime: null,
+  allDay: false,
+  sortField: SortField.None,
+})
 
 export default class App extends React.Component<{}, IState> {
   constructor(props: any) {
     super(props)
-    this.state = this.initialState
+    this.state = initialState
   }
-
-  initialState = Object.freeze({
-    bugs: originalCreatureMap[ListView.Bugs],
-    fish: originalCreatureMap[ListView.Fish],
-    searchInput: '',
-    listView: ListView.Bugs,
-    location: BugLocation.None,
-    sortField: SortField.None,
-  })
 
   get creatures(): ICreature[] {
     return this.state[this.state.listView]
@@ -82,16 +77,16 @@ export default class App extends React.Component<{}, IState> {
   changeListView = (event: React.ChangeEvent<HTMLInputElement>) => {
     const listView = event.target.value
     this.setState({
-      ...this.initialState,
+      ...initialState,
       listView: listView as ListView,
     })
   }
 
   handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value: searchInput } = event.target
-    const { listView, location, sortField } = this.state
+    const { allDay, endTime, listView, location, sortField, startTime } = this.state
     this.setState({
-      ...getCreatureUpdates(listView, sortField, searchInput, location),
+      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
       searchInput,
       ...{},
     })
@@ -100,73 +95,94 @@ export default class App extends React.Component<{}, IState> {
   handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
     const location = value as Location
-    const { listView, searchInput, sortField } = this.state
+    const { allDay, endTime, listView, searchInput, sortField, startTime } = this.state
     this.setState({
-      ...getCreatureUpdates(listView, sortField, searchInput, location),
+      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
       location,
+      ...{},
+    })
+  }
+
+  handleStartTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target
+    console.log(value)
+    const startTime = parseInt(value)
+    if (startTime > -1) {
+      this.setState({
+        startTime,
+        endTime: null,
+      })
+    } else {
+      this.setState({
+        startTime: null,
+        endTime: null,
+      })
+    }
+  }
+
+  handleEndTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target
+    const { allDay, listView, location, searchInput, sortField, startTime } = this.state
+    console.log(value)
+    const endTime = parseInt(value)
+    this.setState({
+      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
+      endTime,
+      ...{},
+    })
+  }
+
+  handleAllDayCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target
+    const { endTime, listView, location, searchInput, sortField, startTime } = this.state
+    const allDay = checked
+    const updates: any = { allDay }
+    if (allDay) {
+      updates.startTime = null
+      updates.endTime = null
+    }
+    this.setState({
+      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
+      ...updates,
       ...{},
     })
   }
 
   handleSortFieldChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
-    const { listView, location, searchInput } = this.state
+    const { allDay, endTime, listView, location, searchInput, startTime } = this.state
     const sortField = value as SortField
     this.setState({
-      ...getCreatureUpdates(listView, sortField, searchInput, location),
+      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
       sortField,
       ...{},
     })
   }
 
   render() {
-    const { listView, location, sortField } = this.state
-    const locations: Location[] =
-      listView === ListView.Bugs ? Object.values(BugLocation) : Object.values(FishLocation)
+    const { allDay, endTime, listView, location, sortField, startTime } = this.state
 
     return (
       <AppContainer>
         <Filters>
           <SearchField search={this.handleSearchInputChange} />
           <Views changeListView={this.changeListView} currentListView={listView} />
-          <div>
-            <span>Location: </span>
-            <select value={location} onChange={this.handleLocationChange}>
-              {locations.map((location: Location) => (
-                <option key={location}>{location}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <span>Sort: </span>
-            <select value={sortField} onChange={this.handleSortFieldChange}>
-              {Object.values(SortField).map((sortField) => (
-                <option key={sortField}>{sortField}</option>
-              ))}
-            </select>
-          </div>
+          <Locations
+            handleLocationChange={this.handleLocationChange}
+            listView={listView}
+            location={location}
+          />
+          <Time
+            handleAllDayCheckboxChange={this.handleAllDayCheckboxChange}
+            handleStartTimeChange={this.handleStartTimeChange}
+            handleEndTimeChange={this.handleEndTimeChange}
+            allDay={allDay}
+            startTime={startTime}
+            endTime={endTime}
+          />
+          <SortFields handleSortFieldChange={this.handleSortFieldChange} sortField={sortField} />
         </Filters>
-        <div>
-          {this.creatures.map((creature) => (
-            <CreatureCard key={creature.id}>
-              <CreatureName>{creature.name}</CreatureName>
-              <div>
-                <div>
-                  <span>Price: </span>
-                  <CreatureInfo>{creature.price}</CreatureInfo>
-                </div>
-                <div>
-                  <span>Location: </span>
-                  <CreatureInfo>{creature.availability.location}</CreatureInfo>
-                </div>
-                <div>
-                  <span>Rarity: </span>
-                  <CreatureInfo>{creature.availability.rarity}</CreatureInfo>
-                </div>
-              </div>
-            </CreatureCard>
-          ))}
-        </div>
+        <Creatures creatures={this.creatures} />
       </AppContainer>
     )
   }
