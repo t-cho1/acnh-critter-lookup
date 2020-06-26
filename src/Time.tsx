@@ -2,15 +2,14 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { getAllTimeString } from './helpers'
-import { Time as TimeType } from './types'
 
 interface IProps {
   handleAllDayCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   handleStartTimeChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
   handleEndTimeChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
   allDay: boolean
-  startTime: TimeType
-  endTime: TimeType
+  startTime: number
+  endTime: number
 }
 
 const AllDay = styled.span`
@@ -30,10 +29,10 @@ export default function Time({
       <span>Time: </span>
       <span>
         <input type="checkbox" onChange={handleAllDayCheckboxChange} />
-        <AllDay>All day</AllDay>
+        <AllDay>All Day</AllDay>
       </span>
       <span>
-        <select value={startTime || '--'} onChange={handleStartTimeChange} disabled={allDay}>
+        <select value={startTime > -1 ? startTime : '--'} onChange={handleStartTimeChange} disabled={allDay}>
           {['--', ...getAllTimeString()].map((timeString, index) => (
             <option key={timeString} value={index - 1}>
               {timeString}
@@ -42,9 +41,9 @@ export default function Time({
         </select>
         <span> - </span>
         <select
-          value={endTime || '--'}
+          value={endTime > -1 ? endTime : '--'}
           onChange={handleEndTimeChange}
-          disabled={startTime === null}
+          disabled={startTime === -1}
         >
           {['--', ...getAllTimeString().slice(startTime as number)].map((timeString, index) => (
             <option key={timeString} value={index - 1}>

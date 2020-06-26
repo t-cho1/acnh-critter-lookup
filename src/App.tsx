@@ -1,13 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ListView, SortField, ICreature, BugLocation, Location, Time as TimeType } from './types'
+import { ListView, SortField, ICreature, BugLocation, Location, Hemisphere, Month } from './types'
 import { originalCreatureMap, getCreatureUpdates } from './helpers'
 
 import SearchField from './SearchInput'
 import Views from './Views'
 import Locations from './Locations'
 import Time from './Time'
+import Months from './Months'
 import SortFields from './SortFields'
 import Creatures from './Creatures'
 
@@ -28,9 +29,15 @@ interface IState {
   location: Location
 
   // time
-  startTime: TimeType
-  endTime: TimeType
+  startTime: number
+  endTime: number
   allDay: boolean
+
+  // months
+  hemisphere: Hemisphere
+  startMonth: number
+  endMonth: number
+  allYear: boolean
 
   // sort field
   sortField: SortField
@@ -58,9 +65,13 @@ const initialState: IState = Object.freeze({
   searchInput: '',
   listView: ListView.Bugs,
   location: BugLocation.None,
-  startTime: null,
-  endTime: null,
+  startTime: -1,
+  endTime: -1,
   allDay: false,
+  hemisphere: Hemisphere.North,
+  startMonth: 0,
+  endMonth: 0,
+  allYear: false,
   sortField: SortField.None,
 })
 
@@ -82,11 +93,42 @@ export default class App extends React.Component<{}, IState> {
     })
   }
 
+  changeHemisphere = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const hemisphere = event.target.value
+    this.setState({
+      ...initialState,
+      hemisphere: hemisphere as Hemisphere,
+    })
+  }
+
   handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value: searchInput } = event.target
-    const { allDay, endTime, listView, location, sortField, startTime } = this.state
+    const {
+      allDay,
+      allYear,
+      endMonth,
+      endTime,
+      hemisphere,
+      listView,
+      location,
+      sortField,
+      startMonth,
+      startTime,
+    } = this.state
     this.setState({
-      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
+      ...getCreatureUpdates(
+        listView,
+        sortField,
+        searchInput,
+        location,
+        startTime,
+        endTime,
+        allDay,
+        hemisphere,
+        startMonth,
+        endMonth,
+        allYear
+      ),
       searchInput,
       ...{},
     })
@@ -95,9 +137,32 @@ export default class App extends React.Component<{}, IState> {
   handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
     const location = value as Location
-    const { allDay, endTime, listView, searchInput, sortField, startTime } = this.state
+    const {
+      allDay,
+      allYear,
+      endMonth,
+      endTime,
+      hemisphere,
+      listView,
+      searchInput,
+      sortField,
+      startMonth,
+      startTime,
+    } = this.state
     this.setState({
-      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
+      ...getCreatureUpdates(
+        listView,
+        sortField,
+        searchInput,
+        location,
+        startTime,
+        endTime,
+        allDay,
+        hemisphere,
+        startMonth,
+        endMonth,
+        allYear
+      ),
       location,
       ...{},
     })
@@ -110,23 +175,46 @@ export default class App extends React.Component<{}, IState> {
     if (startTime > -1) {
       this.setState({
         startTime,
-        endTime: null,
+        endTime: -1,
       })
     } else {
       this.setState({
-        startTime: null,
-        endTime: null,
+        startTime: -1,
+        endTime: -1,
       })
     }
   }
 
   handleEndTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
-    const { allDay, listView, location, searchInput, sortField, startTime } = this.state
+    const {
+      allDay,
+      allYear,
+      endMonth,
+      hemisphere,
+      listView,
+      location,
+      searchInput,
+      sortField,
+      startMonth,
+      startTime,
+    } = this.state
     console.log(value)
     const endTime = parseInt(value)
     this.setState({
-      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
+      ...getCreatureUpdates(
+        listView,
+        sortField,
+        searchInput,
+        location,
+        startTime,
+        endTime,
+        allDay,
+        hemisphere,
+        startMonth,
+        endMonth,
+        allYear
+      ),
       endTime,
       ...{},
     })
@@ -134,15 +222,130 @@ export default class App extends React.Component<{}, IState> {
 
   handleAllDayCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = event.target
-    const { endTime, listView, location, searchInput, sortField, startTime } = this.state
+    const {
+      allYear,
+      endMonth,
+      endTime,
+      hemisphere,
+      listView,
+      location,
+      searchInput,
+      sortField,
+      startMonth,
+      startTime,
+    } = this.state
     const allDay = checked
     const updates: any = { allDay }
     if (allDay) {
-      updates.startTime = null
-      updates.endTime = null
+      updates.startTime = -1
+      updates.endTime = -1
     }
     this.setState({
-      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
+      ...getCreatureUpdates(
+        listView,
+        sortField,
+        searchInput,
+        location,
+        startTime,
+        endTime,
+        allDay,
+        hemisphere,
+        startMonth,
+        endMonth,
+        allYear
+      ),
+      ...updates,
+      ...{},
+    })
+  }
+
+  handleStartMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target
+    console.log(value)
+    const month = parseInt(value)
+    if (month > 0) {
+      this.setState({
+        startMonth: month,
+        endMonth: 0,
+      })
+    } else {
+      this.setState({
+        startMonth: 0,
+        endMonth: 0,
+      })
+    }
+  }
+
+  handleEndMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target
+    const {
+      allDay,
+      allYear,
+      endTime,
+      hemisphere,
+      listView,
+      location,
+      searchInput,
+      sortField,
+      startMonth,
+      startTime,
+    } = this.state
+    console.log(value)
+    const endMonth = parseInt(value)
+    this.setState({
+      ...getCreatureUpdates(
+        listView,
+        sortField,
+        searchInput,
+        location,
+        startTime,
+        endTime,
+        allDay,
+        hemisphere,
+        startMonth,
+        endMonth,
+        allYear
+      ),
+      endMonth,
+      ...{},
+    })
+  }
+
+  handleAllYearCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target
+    console.log(checked)
+    const {
+      allDay,
+      endMonth,
+      endTime,
+      hemisphere,
+      listView,
+      location,
+      searchInput,
+      sortField,
+      startMonth,
+      startTime,
+    } = this.state
+    const allYear = checked
+    const updates: any = { allYear }
+    if (allYear) {
+      updates.startMonth = null
+      updates.endMonth = null
+    }
+    this.setState({
+      ...getCreatureUpdates(
+        listView,
+        sortField,
+        searchInput,
+        location,
+        startTime,
+        endTime,
+        allDay,
+        hemisphere,
+        startMonth,
+        endMonth,
+        allYear,
+      ),
       ...updates,
       ...{},
     })
@@ -150,17 +353,51 @@ export default class App extends React.Component<{}, IState> {
 
   handleSortFieldChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
-    const { allDay, endTime, listView, location, searchInput, startTime } = this.state
+    const {
+      allDay,
+      allYear,
+      endMonth,
+      endTime,
+      hemisphere,
+      listView,
+      location,
+      searchInput,
+      startMonth,
+      startTime,
+    } = this.state
     const sortField = value as SortField
     this.setState({
-      ...getCreatureUpdates(listView, sortField, searchInput, startTime, endTime, allDay, location),
+      ...getCreatureUpdates(
+        listView,
+        sortField,
+        searchInput,
+        location,
+        startTime,
+        endTime,
+        allDay,
+        hemisphere,
+        startMonth,
+        endMonth,
+        allYear
+      ),
       sortField,
       ...{},
     })
   }
 
   render() {
-    const { allDay, endTime, listView, location, sortField, startTime } = this.state
+    const {
+      allDay,
+      allYear,
+      endMonth,
+      endTime,
+      hemisphere,
+      listView,
+      location,
+      sortField,
+      startMonth,
+      startTime,
+    } = this.state
 
     return (
       <AppContainer>
@@ -179,6 +416,16 @@ export default class App extends React.Component<{}, IState> {
             allDay={allDay}
             startTime={startTime}
             endTime={endTime}
+          />
+          <Months
+            handleHemisphereChange={this.changeHemisphere}
+            handleAllYearCheckboxChange={this.handleAllYearCheckboxChange}
+            handleStartMonthChange={this.handleStartMonthChange}
+            handleEndMonthChange={this.handleEndMonthChange}
+            hemisphere={hemisphere}
+            allYear={allYear}
+            startMonth={startMonth}
+            endMonth={endMonth}
           />
           <SortFields handleSortFieldChange={this.handleSortFieldChange} sortField={sortField} />
         </Filters>

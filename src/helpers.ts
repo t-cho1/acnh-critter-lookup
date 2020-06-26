@@ -7,9 +7,10 @@ import {
   BugLocation,
   FishLocation,
   Location,
-  Time,
+  Month,
   Rarity,
   ICreature,
+  Hemisphere,
 } from './types'
 
 export const originalBugs: ICreature[] = convertCreatureJsonToInterface(bugs)
@@ -27,10 +28,11 @@ function convertCreatureJsonToInterface(creatureJson: any) {
     availability: {
       location: availability.location,
       rarity: availability.rarity,
-      time: [...availability['time-array']].sort(),
+      time: availability['time-array'],
       isAllDay: availability.isAllDay,
       monthNorthern: availability['month-array-northern'],
       monthSouthern: availability['month-array-southern'],
+      isAllYear: availability.isAllYear,
     },
   }))
 }
@@ -78,14 +80,32 @@ export function getAllTimeString(): string[] {
   return hours.map((hour: number) => convertNumberToTime(hour))
 }
 
+export function getMonthRanges(months: number[]): string[] {
+  const ranges = []
+  let start = months[0]
+  for (let i = 1; i < months.length; i++) {
+    const prevMonth = months[i - 1]
+    const currMonth = months[i]
+    if (currMonth !== prevMonth + 1 && prevMonth !== 12 && currMonth && 1) {
+      ranges.push(`${Month[start]} - ${Month[prevMonth]}`)
+      start = currMonth
+    }
+  }
+  return [...ranges, `${Month[start]} - ${Month[months[months.length - 1]]}`]
+}
+
 function sortAndFilterCreatures(
   creatures: any[],
   sortField: SortField,
   searchKeyword: string,
   location: Location,
-  startTime: Time,
-  endTime: Time,
-  allDay: boolean
+  startTime: number,
+  endTime: number,
+  allDay: boolean,
+  hemisphere: Hemisphere,
+  startMonth: number,
+  endMonth: number,
+  allYear: boolean
 ): ICreature[] {
   console.log(sortField, searchKeyword, location, startTime, endTime)
   // sort first
@@ -98,6 +118,13 @@ function sortAndFilterCreatures(
   } else {
     filtered = filterByTime(filtered, startTime, endTime)
   }
+
+  if (allYear) {
+    filtered = filterByAllYear(filtered)
+  } else if (startMonth > 0 && endMonth > 0) {
+    filtered = filterByMonth(filtered, hemisphere, startMonth, endMonth)
+  }
+
   filtered = filterBySearchKeyword(filtered, searchKeyword)
 
   return filtered
@@ -148,32 +175,51 @@ function filterByLocation(creatures: ICreature[], location: Location): ICreature
   )
 }
 
-function filterByTime(
-  creatures: ICreature[],
-  startTime: Time,
-  endTime: Time
-): ICreature[] {
-  if (startTime === null) {
+function filterByTime(creatures: ICreature[], startTime: number, endTime: number): ICreature[] {
+  if (startTime === -1) {
     return creatures
   }
-  return creatures.filter(
-    ({ availability: { time } }) =>
-      time[0] <= startTime && (endTime as number) <= time[time.length - 1]
-  )
+  return creatures.filter(({ availability: { time } }) => {
+    const timeSet = new Set(time)
+    return timeSet.has(startTime) && timeSet.has(endTime)
+  })
 }
 
 function filterByAllDay(creatures: ICreature[]) {
   return creatures.filter(({ availability: { isAllDay } }) => isAllDay)
 }
 
+function filterByMonth(
+  creatures: ICreature[],
+  hemisphere: Hemisphere,
+  startMonth: number,
+  endMonth: number
+): ICreature[] {
+  if (startMonth === null || endMonth === null) {
+    return creatures
+  }
+  return creatures.filter(({ availability: { monthNorthern, monthSouthern } }) => {
+    const monthSet = new Set(hemisphere === Hemisphere.North ? monthNorthern : monthSouthern)
+    return monthSet.has(startMonth) && monthSet.has(endMonth)
+  })
+}
+
+function filterByAllYear(creatures: ICreature[]) {
+  return creatures.filter(({ availability: { isAllYear } }) => isAllYear)
+}
+
 export function getCreatureUpdates(
   listView: ListView,
   sortField: SortField,
   searchInput: string,
-  startTime: Time,
-  endTime: Time,
+  location: Location,
+  startTime: number,
+  endTime: number,
   allDay: boolean,
-  location: Location
+  hemisphere: Hemisphere,
+  startMonth: number,
+  endMonth: number,
+  allYear: boolean
 ) {
   return {
     [listView]: sortAndFilterCreatures(
@@ -184,6 +230,10 @@ export function getCreatureUpdates(
       startTime,
       endTime,
       allDay,
+      hemisphere,
+      startMonth,
+      endMonth,
+      allYear
     ),
   }
 }

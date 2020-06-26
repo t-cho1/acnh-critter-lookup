@@ -10,7 +10,7 @@ export enum SortField {
   PriceLowHigh = 'Price (Low - High)',
   PriceHighLow = 'Price (High - Low)',
   RarityLessMore = 'Rarity (Less - More)',
-  RarityMoreLess = 'Rarity (More - Less)'
+  RarityMoreLess = 'Rarity (More - Less)',
 }
 
 export enum BugLocation {
@@ -50,6 +50,27 @@ export enum FishLocation {
   SeaWhenRainingOrSnowing = 'Sea (when raining or snowing)',
 }
 
+export enum Hemisphere {
+  North = 'Northern',
+  South = 'Southern',
+}
+
+export const Month = [
+  '--',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+
 export enum Rarity {
   Common = 1,
   Uncommon,
@@ -58,7 +79,6 @@ export enum Rarity {
 }
 
 export type Location = BugLocation | FishLocation
-export type Time = number | null
 
 interface Availability {
   readonly location: Location
@@ -67,6 +87,7 @@ interface Availability {
   readonly isAllDay: boolean
   readonly monthNorthern: number[] // starts at 1
   readonly monthSouthern: number[] // starts at 1
+  readonly isAllYear: boolean
 }
 
 export interface ICreature {
