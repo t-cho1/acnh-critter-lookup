@@ -1,33 +1,45 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
 
 import { Hemisphere, Month } from './types'
-
-interface IProps {
-  handleHemisphereChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-  handleAllYearCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-  handleStartMonthChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
-  handleEndMonthChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
-  hemisphere: Hemisphere
-  allYear: boolean
-  startMonth: number
-  endMonth: number
-}
+import { MonthsContext } from './months-context'
 
 const AllYear = styled.span`
   margin-right: 8px;
 `
 
-export default function Months({
-  handleHemisphereChange,
-  handleAllYearCheckboxChange,
-  handleStartMonthChange,
-  handleEndMonthChange,
-  hemisphere,
-  allYear,
-  startMonth,
-  endMonth,
-}: IProps) {
+export default function Months() {
+  const {
+    hemisphere,
+    allYear,
+    startMonth,
+    endMonth,
+    setHemisphere,
+    setAllYear,
+    setStartMonth,
+    setEndMonth,
+  } = useContext(MonthsContext)
+
+  const handleAllYearCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target
+    if (checked) {
+      setStartMonth(0)
+      setEndMonth(0)
+    }
+    setAllYear(checked)
+  }
+
+  const handleStartMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target
+    const startMonth = parseInt(value)
+    if (startMonth > 0) {
+      setStartMonth(startMonth)
+    } else {
+      setStartMonth(0)
+    }
+    setEndMonth(0)
+  }
+
   return (
     <div>
       <span>Months: </span>
@@ -35,7 +47,7 @@ export default function Months({
         <div>
           <input
             type="radio"
-            onChange={handleHemisphereChange}
+            onChange={() => setHemisphere(Hemisphere.North)}
             value={Hemisphere.North}
             checked={hemisphere === Hemisphere.North}
           />
@@ -44,7 +56,7 @@ export default function Months({
         <div>
           <input
             type="radio"
-            onChange={handleHemisphereChange}
+            onChange={() => setHemisphere(Hemisphere.South)}
             value={Hemisphere.South}
             checked={hemisphere === Hemisphere.South}
           />
@@ -64,7 +76,11 @@ export default function Months({
           ))}
         </select>
         <span> - </span>
-        <select value={endMonth || ''} onChange={handleEndMonthChange} disabled={!startMonth}>
+        <select
+          value={endMonth || ''}
+          onChange={(event) => setEndMonth(parseInt(event.target.value))}
+          disabled={!startMonth}
+        >
           {Month.slice(startMonth).map((month, index) => (
             <option key={month} value={index}>
               {month}

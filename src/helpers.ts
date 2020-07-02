@@ -13,15 +13,8 @@ import {
   Hemisphere,
 } from './types'
 
-export const originalBugs: ICreature[] = convertCreatureJsonToInterface(bugs)
-export const originalFish: ICreature[] = convertCreatureJsonToInterface(fish)
-export const originalCreatureMap = Object.freeze({
-  [ListView.Bugs]: originalBugs,
-  [ListView.Fish]: originalFish,
-})
-
-function convertCreatureJsonToInterface(creatureJson: any) {
-  return Object.values(creatureJson).map(({ id, name, price, availability }: any) => ({
+const convertCreatureJsonToInterface = (creatureJson: any) =>
+  Object.values(creatureJson).map(({ id, name, price, availability }: any) => ({
     id,
     name: name['name-USen'],
     price,
@@ -35,17 +28,22 @@ function convertCreatureJsonToInterface(creatureJson: any) {
       isAllYear: availability.isAllYear,
     },
   }))
-}
 
-export function compareString(a: string, b: string): number {
-  return a.toLowerCase() > b.toLowerCase() ? 1 : -1
-}
+export const originalBugs: ICreature[] = convertCreatureJsonToInterface(bugs)
+export const originalFish: ICreature[] = convertCreatureJsonToInterface(fish)
+export const originalCreatureMap = Object.freeze({
+  [ListView.Bugs]: originalBugs,
+  [ListView.Fish]: originalFish,
+})
+
+export const compareString = (a: string, b: string): number =>
+  a.toLowerCase() > b.toLowerCase() ? 1 : -1
 
 /**
  * Find if b is a subsequence of a
  * eg. isSubsequence('abcde', 'ace') => true, isSubsequence('abcde', 'abf') => false
  */
-export function isSubsequence(a: string, b: string): boolean {
+export const isSubsequence = (a: string, b: string): boolean => {
   let j = 0
   let [n, m] = [a.length, b.length]
   for (let i = 0; i < n && j < m; i++) {
@@ -60,7 +58,7 @@ export function isSubsequence(a: string, b: string): boolean {
  * Convert number to time of day
  * eg. convertNumberToTime(5) => '5am', convertNumberToTime(18) => '6pm
  */
-export function convertNumberToTime(n: number): string {
+export const convertNumberToTime = (n: number): string => {
   // special cases
   if (n === 0) {
     return '12am'
@@ -72,7 +70,7 @@ export function convertNumberToTime(n: number): string {
   return `${n % 12}${suffix}`
 }
 
-export function getAllTimeString(): string[] {
+export const getAllTimeString = (): string[] => {
   const hours = []
   for (let i = 0; i < 24; i++) {
     hours.push(i)
@@ -80,7 +78,7 @@ export function getAllTimeString(): string[] {
   return hours.map((hour: number) => convertNumberToTime(hour))
 }
 
-export function getMonthRanges(months: number[]): string[] {
+export const getMonthRanges = (months: number[]): string[] => {
   const ranges = []
   let start = months[0]
   for (let i = 1; i < months.length; i++) {
@@ -94,146 +92,64 @@ export function getMonthRanges(months: number[]): string[] {
   return [...ranges, `${Month[start]} - ${Month[months[months.length - 1]]}`]
 }
 
-function sortAndFilterCreatures(
-  creatures: any[],
-  sortField: SortField,
-  searchKeyword: string,
-  location: Location,
-  startTime: number,
-  endTime: number,
-  allDay: boolean,
-  hemisphere: Hemisphere,
-  startMonth: number,
-  endMonth: number,
-  allYear: boolean
-): ICreature[] {
-  console.log(sortField, searchKeyword, location, startTime, endTime)
-  // sort first
-  const sortedBySortField = sortBySortField(creatures, sortField)
-
-  // then filter
-  let filtered = filterByLocation(sortedBySortField, location)
-  if (allDay) {
-    filtered = filterByAllDay(filtered)
-  } else {
-    filtered = filterByTime(filtered, startTime, endTime)
-  }
-
-  if (allYear) {
-    filtered = filterByAllYear(filtered)
-  } else if (startMonth > 0 && endMonth > 0) {
-    filtered = filterByMonth(filtered, hemisphere, startMonth, endMonth)
-  }
-
-  filtered = filterBySearchKeyword(filtered, searchKeyword)
-
-  return filtered
-}
-
-function sortBySortField(creatures: any[], sortField: SortField): ICreature[] {
-  const newCreatures = [...creatures]
+export const sortBySortField = (sortField: SortField) => (a: ICreature, b: ICreature) => {
   switch (sortField) {
     case SortField.None:
-      return newCreatures.sort((a: ICreature, b: ICreature) => a.id - b.id)
+      return a.id - b.id
 
     case SortField.NameAZ:
-      return newCreatures.sort((a: ICreature, b: ICreature) => compareString(a.name, b.name))
+      return compareString(a.name, b.name)
 
     case SortField.NameZA:
-      return newCreatures.sort((a: ICreature, b: ICreature) => compareString(b.name, a.name))
+      return compareString(b.name, a.name)
 
     case SortField.PriceLowHigh:
-      return newCreatures.sort((a: ICreature, b: ICreature) => a.price - b.price)
+      return a.price - b.price
 
     case SortField.PriceHighLow:
-      return newCreatures.sort((a: ICreature, b: ICreature) => b.price - a.price)
+      return b.price - a.price
 
     case SortField.RarityLessMore:
-      return newCreatures.sort(
-        (a: ICreature, b: ICreature) =>
-          (Rarity as any)[a.availability.rarity] - (Rarity as any)[b.availability.rarity]
-      )
+      return (Rarity as any)[a.availability.rarity] - (Rarity as any)[b.availability.rarity]
 
     case SortField.RarityMoreLess:
-      return newCreatures.sort(
-        (a: ICreature, b: ICreature) =>
-          (Rarity as any)[b.availability.rarity] - (Rarity as any)[a.availability.rarity]
-      )
+      return (Rarity as any)[b.availability.rarity] - (Rarity as any)[a.availability.rarity]
   }
 }
 
-function filterBySearchKeyword(creatures: ICreature[], keyword: string): ICreature[] {
-  return creatures.filter(({ name }) => isSubsequence(name.toLowerCase(), keyword.toLowerCase()))
-}
+export const filterBySearchInput = (searchInput: string) => (creature: ICreature) =>
+  isSubsequence(creature.name.toLowerCase(), searchInput.toLowerCase())
 
-function filterByLocation(creatures: ICreature[], location: Location): ICreature[] {
+export const filterByLocation = (location: Location) => (creature: ICreature) => {
   if (location === BugLocation.None || location === FishLocation.None) {
-    return creatures
+    return true
   }
-  return creatures.filter(
-    ({ availability: { location: creatureLocation } }) => creatureLocation === location
-  )
+  return creature.availability.location === location
 }
 
-function filterByTime(creatures: ICreature[], startTime: number, endTime: number): ICreature[] {
-  if (startTime === -1) {
-    return creatures
+export const filterByAllDay = (allDay: boolean) => (creature: ICreature) =>
+  creature.availability.isAllDay === allDay
+
+export const filterByTime = (startTime: number, endTime: number) => (creature: ICreature) => {
+  if (endTime === -1) {
+    return true
   }
-  return creatures.filter(({ availability: { time } }) => {
-    const timeSet = new Set(time)
-    return timeSet.has(startTime) && timeSet.has(endTime)
-  })
+  const timeSet = new Set(creature.availability.time)
+  return timeSet.has(startTime) && timeSet.has(endTime)
 }
 
-function filterByAllDay(creatures: ICreature[]) {
-  return creatures.filter(({ availability: { isAllDay } }) => isAllDay)
-}
+export const filterByAllYear = (allYear: boolean) => (creature: ICreature) =>
+  creature.availability.isAllYear === allYear
 
-function filterByMonth(
-  creatures: ICreature[],
-  hemisphere: Hemisphere,
-  startMonth: number,
-  endMonth: number
-): ICreature[] {
-  if (startMonth === null || endMonth === null) {
-    return creatures
+export const filterByMonth = (hemisphere: Hemisphere, startMonth: number, endMonth: number) => (
+  creature: ICreature
+) => {
+  if (startMonth === 0 || endMonth === 0) {
+    return true
   }
-  return creatures.filter(({ availability: { monthNorthern, monthSouthern } }) => {
-    const monthSet = new Set(hemisphere === Hemisphere.North ? monthNorthern : monthSouthern)
-    return monthSet.has(startMonth) && monthSet.has(endMonth)
-  })
-}
-
-function filterByAllYear(creatures: ICreature[]) {
-  return creatures.filter(({ availability: { isAllYear } }) => isAllYear)
-}
-
-export function getCreatureUpdates(
-  listView: ListView,
-  sortField: SortField,
-  searchInput: string,
-  location: Location,
-  startTime: number,
-  endTime: number,
-  allDay: boolean,
-  hemisphere: Hemisphere,
-  startMonth: number,
-  endMonth: number,
-  allYear: boolean
-) {
-  return {
-    [listView]: sortAndFilterCreatures(
-      originalCreatureMap[listView],
-      sortField,
-      searchInput,
-      location,
-      startTime,
-      endTime,
-      allDay,
-      hemisphere,
-      startMonth,
-      endMonth,
-      allYear
-    ),
-  }
+  const {
+    availability: { monthNorthern, monthSouthern },
+  } = creature
+  const monthSet = new Set(hemisphere === Hemisphere.North ? monthNorthern : monthSouthern)
+  return monthSet.has(startMonth) && monthSet.has(endMonth)
 }

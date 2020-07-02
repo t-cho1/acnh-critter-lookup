@@ -1,17 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { SortField } from './types'
+import { SortFieldContext } from './sort-field-context'
 
-interface IProps {
-  handleSortFieldChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
-  sortField: SortField
-}
+export default function SortFields() {
+  const { sortField, setSortField } = useContext(SortFieldContext)
 
-export default function SortFields({ handleSortFieldChange, sortField }: IProps) {
   return (
     <div>
       <span>Sort: </span>
-      <select value={sortField} onChange={handleSortFieldChange}>
+      <select value={sortField} onChange={(event) => setSortField(event.target.value as SortField)}>
         {Object.values(SortField).map((sortField) => (
           <option key={sortField}>{sortField}</option>
         ))}

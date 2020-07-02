@@ -1,12 +1,24 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
 
-import { ICreature } from './types'
-import { convertNumberToTime, getMonthRanges } from './helpers'
-
-interface IProps {
-  creatures: ICreature[]
-}
+import {
+  originalCreatureMap,
+  convertNumberToTime,
+  getMonthRanges,
+  sortBySortField,
+  filterByLocation,
+  filterByAllDay,
+  filterByTime,
+  filterByAllYear,
+  filterByMonth,
+  filterBySearchInput,
+} from './helpers'
+import { SearchInputContext } from './search-input-context'
+import { ListViewContext } from './list-view-context'
+import { LocationsContext } from './locations-context'
+import { TimeContext } from './time-context'
+import { MonthsContext } from './months-context'
+import { SortFieldContext } from './sort-field-context'
 
 const CreatureName = styled.h1`
   margin: 0;
@@ -31,7 +43,21 @@ function getTimeDisplay(time: number[]): string {
   return `${startTime} - ${endTime}`
 }
 
-export default function Creatures({ creatures }: IProps) {
+export default function Creatures() {
+  const { searchInput } = useContext(SearchInputContext)
+  const { listView } = useContext(ListViewContext)
+  const { location } = useContext(LocationsContext)
+  const { allDay, startTime, endTime } = useContext(TimeContext)
+  const { hemisphere, allYear, startMonth, endMonth } = useContext(MonthsContext)
+  const { sortField } = useContext(SortFieldContext)
+
+  const creatures = originalCreatureMap[listView]
+    .filter(filterBySearchInput(searchInput))
+    .filter(filterByLocation(location))
+    .filter(allDay ? filterByAllDay(allDay) : filterByTime(startTime, endTime))
+    .filter(allYear ? filterByAllYear(allYear) : filterByMonth(hemisphere, startMonth, endMonth))
+    .sort(sortBySortField(sortField))
+
   return (
     <div>
       {creatures.map(
@@ -74,7 +100,7 @@ export default function Creatures({ creatures }: IProps) {
               </div>
               <div>
                 <Label>Rarity: </Label>
-                {/** fix ultra-rare (it shows up as Ultra-rare) */}
+                {/** TODO: fix ultra-rare (it shows up as Ultra-rare) */}
                 <span>{rarity}</span>
               </div>
             </div>

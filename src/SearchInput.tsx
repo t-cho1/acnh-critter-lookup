@@ -1,20 +1,24 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
 
-interface IProps {
-  search: (event: React.ChangeEvent<HTMLInputElement>) => void
-}
+import { SearchInputContext } from './search-input-context'
 
 const SearchInputContainer = styled.div`
   display: flex;
   white-space: pre;
 `
 
-export default function SearchInput({ search }: IProps) {
+export default function SearchInput() {
+  const { searchInput, setSearchInput } = useContext(SearchInputContext)
+
   return (
     <SearchInputContainer>
       <span>Search: </span>
-      <input type="text" onChange={search} />
+      <input
+        type="text"
+        value={searchInput}
+        onChange={(event) => setSearchInput(event.target.value as string)}
+      />
     </SearchInputContainer>
   )
 }

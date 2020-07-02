@@ -1,20 +1,20 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { BugLocation, FishLocation, ListView, Location } from './types'
+import { LocationsContext } from './locations-context'
+import { ListViewContext } from './list-view-context'
 
-interface IProps {
-  handleLocationChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
-  listView: ListView
-  location: Location
-}
+export default function Locations() {
+  const { listView } = useContext(ListViewContext)
+  const { location, setLocation } = useContext(LocationsContext)
 
-export default function Locations({ handleLocationChange, listView, location }: IProps) {
   const locations: Location[] =
     listView === ListView.Bugs ? Object.values(BugLocation) : Object.values(FishLocation)
+
   return (
     <div>
       <span>Location: </span>
-      <select value={location} onChange={handleLocationChange}>
+      <select value={location} onChange={(event) => setLocation(event.target.value as Location)}>
         {locations.map((location: Location) => (
           <option key={location}>{location}</option>
         ))}
