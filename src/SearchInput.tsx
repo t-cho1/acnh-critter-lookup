@@ -6,6 +6,8 @@ import { SearchInputContext } from './search-input-context'
 const SearchInputContainer = styled.div`
   display: flex;
   white-space: pre;
+  /* margin-right: 24px; */
+  height: 24px;
 `
 
 export default function SearchInput() {

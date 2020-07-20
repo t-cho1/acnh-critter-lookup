@@ -8,6 +8,7 @@ import { SearchInputContextProvider } from './search-input-context'
 import { ListViewContextProvider } from './list-view-context'
 import { LocationsContextProvider } from './locations-context'
 import { TimeContextProvider } from './time-context'
+import { HemispheresContextProvider } from './hemispheres-context'
 import { MonthsContextProvider } from './months-context'
 import { SortFieldContextProvider } from './sort-field-context'
 
@@ -16,13 +17,15 @@ ReactDOM.render(
     <SearchInputContextProvider>
       <LocationsContextProvider>
         <TimeContextProvider>
-          <MonthsContextProvider>
-            <SortFieldContextProvider>
-              <ListViewContextProvider>
-                <App />
-              </ListViewContextProvider>
-            </SortFieldContextProvider>
-          </MonthsContextProvider>
+          <HemispheresContextProvider>
+            <MonthsContextProvider>
+              <SortFieldContextProvider>
+                <ListViewContextProvider>
+                  <App />
+                </ListViewContextProvider>
+              </SortFieldContextProvider>
+            </MonthsContextProvider>
+          </HemispheresContextProvider>
         </TimeContextProvider>
       </LocationsContextProvider>
     </SearchInputContextProvider>

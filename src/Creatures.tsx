@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   originalCreatureMap,
@@ -17,20 +17,37 @@ import { SearchInputContext } from './search-input-context'
 import { ListViewContext } from './list-view-context'
 import { LocationsContext } from './locations-context'
 import { TimeContext } from './time-context'
+import { HemispheresContext } from './hemispheres-context'
 import { MonthsContext } from './months-context'
 import { SortFieldContext } from './sort-field-context'
 
-const CreatureName = styled.h1`
-  margin: 0;
+const Container = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  row-gap: 24px;
+  column-gap: 12px;
+
+  @media (max-width: 850px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const CreatureName = styled.h2`
+  margin: 0 0 8px;
   text-transform: capitalize;
+  text-decoration: underline;
 `
 
 const CreatureCard = styled.div`
   border: 1px solid;
-  margin-bottom: 16px;
+  /* margin-bottom: 16px; */
   padding: 8px;
   border-radius: 2px;
-  box-shadow: 1px 1px #888;
+  /* box-shadow: 1px 1px #888; */
 `
 
 const Label = styled.span`
@@ -48,7 +65,8 @@ export default function Creatures() {
   const { listView } = useContext(ListViewContext)
   const { location } = useContext(LocationsContext)
   const { allDay, startTime, endTime } = useContext(TimeContext)
-  const { hemisphere, allYear, startMonth, endMonth } = useContext(MonthsContext)
+  const { hemisphere } = useContext(HemispheresContext)
+  const { allYear, startMonth, endMonth } = useContext(MonthsContext)
   const { sortField } = useContext(SortFieldContext)
 
   const creatures = originalCreatureMap[listView]
@@ -59,7 +77,7 @@ export default function Creatures() {
     .sort(sortBySortField(sortField))
 
   return (
-    <div>
+    <Container>
       {creatures.map(
         ({
           id,
@@ -107,6 +125,6 @@ export default function Creatures() {
           </CreatureCard>
         )
       )}
-    </div>
+    </Container>
   )
 }

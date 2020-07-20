@@ -4,6 +4,16 @@ import styled from 'styled-components'
 import { getAllTimeString } from './helpers'
 import { TimeContext } from './time-context'
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+
+  @media (max-width: 600px) {
+    justify-self: unset;
+  }
+`
+
 const AllDay = styled.span`
   margin-right: 8px;
 `
@@ -34,7 +44,7 @@ export default function Time() {
   }
 
   return (
-    <div>
+    <Container>
       <span>Time: </span>
       <span>
         <input type="checkbox" onChange={handleAllDayCheckboxChange} />
@@ -65,6 +75,6 @@ export default function Time() {
           ))}
         </select>
       </span>
-    </div>
+    </Container>
   )
 }
