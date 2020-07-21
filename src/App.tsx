@@ -99,6 +99,8 @@ const Content = styled.div`
 const Bottom = styled.div`
   position: absolute;
   bottom: 0;
+  left: 4vw;
+  right: 4vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -179,9 +181,9 @@ export default function App() {
             {isBottomFiltersOpen ? 'v Filters v' : '^ Filters ^'}
           </BottomFiltersLabel>
           <BottomItems>
-            <SearchInput />
-            <Views />
-            <SortFields />
+            <SearchInput isSmallViewport/>
+            <Views isSmallViewport/>
+            <SortFields isSmallViewport/>
           </BottomItems>
         </Bottom>
       )}

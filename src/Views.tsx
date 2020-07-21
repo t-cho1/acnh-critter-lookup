@@ -7,12 +7,16 @@ import { SearchInputContext } from './search-input-context'
 import { LocationsContext } from './locations-context'
 import { SortFieldContext } from './sort-field-context'
 
+interface IProps {
+  isSmallViewport?: boolean
+}
+
 const ViewsContainer = styled.div`
   display: flex;
   align-items: center;
 `
 
-export default function Views() {
+export default function Views({ isSmallViewport }: IProps) {
   const { listView, setListView } = useContext(ListViewContext)
   const { setSearchInput } = useContext(SearchInputContext)
   const { setLocation } = useContext(LocationsContext)
@@ -28,7 +32,7 @@ export default function Views() {
 
   return (
     <ViewsContainer>
-      <span>View: </span>
+      {!isSmallViewport && <span>View: </span>}
       <div>
         <input
           type="radio"
