@@ -14,20 +14,24 @@ import {
 } from './types'
 
 const convertCreatureJsonToInterface = (creatureJson: any) =>
-  Object.values(creatureJson).map(({ id, name, price, availability }: any) => ({
-    id,
-    name: name['name-USen'],
-    price,
-    availability: {
-      location: availability.location,
-      rarity: availability.rarity === 'Ultra-rare' ? 'UltraRare' : availability.rarity,
-      time: availability['time-array'],
-      isAllDay: availability.isAllDay,
-      monthNorthern: availability['month-array-northern'],
-      monthSouthern: availability['month-array-southern'],
-      isAllYear: availability.isAllYear,
-    },
-  }))
+  Object.values(creatureJson).map((creature: any) => {
+    const { id, name, price, availability } = creature
+    return {
+      id,
+      name: name['name-USen'],
+      fileName: creature['file-name'],
+      price,
+      availability: {
+        location: availability.location,
+        rarity: availability.rarity === 'Ultra-rare' ? 'UltraRare' : availability.rarity,
+        time: availability['time-array'],
+        isAllDay: availability.isAllDay,
+        monthNorthern: availability['month-array-northern'],
+        monthSouthern: availability['month-array-southern'],
+        isAllYear: availability.isAllYear,
+      },
+    }
+  })
 
 export const originalBugs: ICreature[] = convertCreatureJsonToInterface(bugs)
 export const originalFish: ICreature[] = convertCreatureJsonToInterface(fish)

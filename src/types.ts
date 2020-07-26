@@ -93,6 +93,7 @@ interface Availability {
 export interface ICreature {
   readonly id: number
   readonly name: string
+  readonly fileName: string
   readonly price: number
   readonly availability: Availability
 }

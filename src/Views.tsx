@@ -24,12 +24,12 @@ export default function Views() {
 
   return (
     <Flex alignItems="center" justifySelf="center">
-      <Text mr={1}>Bugs</Text>
+      <Text mr={2}>Bugs</Text>
       <Switch
         onClick={() => changeListView(listView === ListView.Bugs ? ListView.Fish : ListView.Bugs)}
         checked={listView === ListView.Fish}
       />
-      <Text ml={1}>Fish</Text>
+      <Text ml={2}>Fish</Text>
     </Flex>
   )
 }

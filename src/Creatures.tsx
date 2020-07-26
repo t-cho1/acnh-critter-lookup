@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Calendar, Clock, DollarSign, Gift, Map } from 'react-feather'
-import { Box, Flex, Text } from 'rebass'
+import { Box, Flex, Image, Text } from 'rebass'
 
 import { Rarity } from './types'
 import {
@@ -79,10 +79,11 @@ export default function Creatures() {
             time,
           },
           name,
+          fileName,
           price,
         }) => (
-          <Box key={id} p={2} sx={{ border: '1px solid', borderRadius: '2px' }}>
-            <Box mb={2}>
+          <Box key={id} px={3} py={2} sx={{ border: '1px solid', borderRadius: '2px' }}>
+            <Flex alignItems="center" justifyContent="space-between">
               <Text
                 fontWeight="bold"
                 fontSize={4}
@@ -90,7 +91,12 @@ export default function Creatures() {
               >
                 {name}
               </Text>
-            </Box>
+              <Image
+                src={`${process.env.PUBLIC_URL}/icons/${listView}/${fileName}.png`}
+                alt={name}
+                sx={{ width: '56px' }}
+              />
+            </Flex>
             <div>
               <Flex alignItems="center" mb={2}>
                 <Flex mr={1}>
