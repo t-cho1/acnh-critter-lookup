@@ -82,7 +82,7 @@ export default function Creatures() {
           fileName,
           price,
         }) => (
-          <Box key={id} px={3} py={2} sx={{ border: '1px solid', borderRadius: '2px' }}>
+          <Box key={id} px={3} pt={1} pb={2} sx={{ border: '1px solid', borderRadius: '2px' }}>
             <Flex alignItems="center" justifyContent="space-between">
               <Text
                 fontWeight="bold"
