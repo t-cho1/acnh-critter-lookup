@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "d9933c123728448a9bc3b74a5cb5974c",
+    "revision": "a443d4ecae2b0ac25c7aa3563fddbf47",
     "url": "/acnh-critter-lookup/index.html"
   },
   {
-    "revision": "a43e41a709be44606c01",
+    "revision": "fa67f807ab7bae7d6ed8",
     "url": "/acnh-critter-lookup/static/css/main.461cd187.chunk.css"
   },
   {
-    "revision": "e6c2eb8e54a5b9440003",
-    "url": "/acnh-critter-lookup/static/js/2.9636ac1b.chunk.js"
+    "revision": "c96a3122376ef32d53e9",
+    "url": "/acnh-critter-lookup/static/js/2.215c7204.chunk.js"
   },
   {
     "revision": "e88a3e95b5364d46e95b35ae8c0dc27d",
-    "url": "/acnh-critter-lookup/static/js/2.9636ac1b.chunk.js.LICENSE.txt"
+    "url": "/acnh-critter-lookup/static/js/2.215c7204.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "a43e41a709be44606c01",
-    "url": "/acnh-critter-lookup/static/js/main.9a66db99.chunk.js"
+    "revision": "fa67f807ab7bae7d6ed8",
+    "url": "/acnh-critter-lookup/static/js/main.040a612a.chunk.js"
   },
   {
     "revision": "a0ae8bab9bf6c3690e26",
