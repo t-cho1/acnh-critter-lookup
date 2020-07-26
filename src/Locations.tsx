@@ -1,14 +1,10 @@
 import React, { useContext } from 'react'
-import styled from 'styled-components'
+import { Flex } from 'rebass'
+import { Label, Select } from '@rebass/forms'
 
 import { BugLocation, FishLocation, ListView, Location } from './types'
 import { LocationsContext } from './locations-context'
 import { ListViewContext } from './list-view-context'
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-`
 
 export default function Locations() {
   const { listView } = useContext(ListViewContext)
@@ -18,13 +14,13 @@ export default function Locations() {
     listView === ListView.Bugs ? Object.values(BugLocation) : Object.values(FishLocation)
 
   return (
-    <Container>
-      <span>Location: </span>
-      <select value={location} onChange={(event) => setLocation(event.target.value as Location)}>
+    <Flex flexDirection="column">
+      <Label>Location: </Label>
+      <Select value={location} onChange={(event) => setLocation(event.target.value as Location)}>
         {locations.map((location: Location) => (
           <option key={location}>{location}</option>
         ))}
-      </select>
-    </Container>
+      </Select>
+    </Flex>
   )
 }

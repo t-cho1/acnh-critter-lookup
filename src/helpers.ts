@@ -20,7 +20,7 @@ const convertCreatureJsonToInterface = (creatureJson: any) =>
     price,
     availability: {
       location: availability.location,
-      rarity: availability.rarity,
+      rarity: availability.rarity === 'Ultra-rare' ? 'UltraRare' : availability.rarity,
       time: availability['time-array'],
       isAllDay: availability.isAllDay,
       monthNorthern: availability['month-array-northern'],
@@ -92,6 +92,8 @@ export const getMonthRanges = (months: number[]): string[] => {
   return [...ranges, `${Month[start]} - ${Month[months[months.length - 1]]}`]
 }
 
+const getRarityValue = (rarity: Rarity): number => Object.keys(Rarity).indexOf(rarity)
+
 export const sortBySortField = (sortField: SortField) => (a: ICreature, b: ICreature) => {
   switch (sortField) {
     case SortField.None:
@@ -110,10 +112,10 @@ export const sortBySortField = (sortField: SortField) => (a: ICreature, b: ICrea
       return b.price - a.price
 
     case SortField.RarityLessMore:
-      return (Rarity as any)[a.availability.rarity] - (Rarity as any)[b.availability.rarity]
+      return getRarityValue(a.availability.rarity) - getRarityValue(b.availability.rarity)
 
     case SortField.RarityMoreLess:
-      return (Rarity as any)[b.availability.rarity] - (Rarity as any)[a.availability.rarity]
+      return getRarityValue(b.availability.rarity) - getRarityValue(a.availability.rarity)
   }
 }
 

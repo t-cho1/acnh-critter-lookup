@@ -1,22 +1,9 @@
 import React, { useContext } from 'react'
-import styled from 'styled-components'
+import { Box, Flex, Text } from 'rebass'
+import { Label, Checkbox, Select } from '@rebass/forms'
 
 import { getAllTimeString } from './helpers'
 import { TimeContext } from './time-context'
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-self: center;
-
-  @media (max-width: 600px) {
-    justify-self: unset;
-  }
-`
-
-const AllDay = styled.span`
-  margin-right: 8px;
-`
 
 export default function Time() {
   const { allDay, startTime, endTime, setAllDay, setStartTime, setEndTime } = useContext(
@@ -44,14 +31,22 @@ export default function Time() {
   }
 
   return (
-    <Container>
+    <Flex
+      justifySelf="center"
+      flexDirection="column"
+      sx={{
+        '@media (max-width: 600px)': {
+          justifySelf: 'unset',
+        },
+      }}
+    >
       <span>Time: </span>
-      <span>
-        <input type="checkbox" onChange={handleAllDayCheckboxChange} />
-        <AllDay>All Day</AllDay>
-      </span>
-      <span>
-        <select
+      <Label alignItems="center">
+        <Checkbox onChange={handleAllDayCheckboxChange} />
+        All Day
+      </Label>
+      <Flex alignItems="center">
+        <Select
           value={startTime > -1 ? startTime : '--'}
           onChange={handleStartTimeChange}
           disabled={allDay}
@@ -61,9 +56,11 @@ export default function Time() {
               {timeString}
             </option>
           ))}
-        </select>
-        <span> - </span>
-        <select
+        </Select>
+        <Box mx={3}>
+          <Text>-</Text>
+        </Box>
+        <Select
           value={endTime > -1 ? endTime : '--'}
           onChange={(event) => setEndTime(parseInt(event.target.value))}
           disabled={startTime === -1}
@@ -73,8 +70,8 @@ export default function Time() {
               {timeString}
             </option>
           ))}
-        </select>
-      </span>
-    </Container>
+        </Select>
+      </Flex>
+    </Flex>
   )
 }

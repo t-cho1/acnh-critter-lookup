@@ -1,6 +1,8 @@
 import React, { useContext } from 'react'
-import styled, { css } from 'styled-components'
+import { Calendar, Clock, DollarSign, Gift, Map } from 'react-feather'
+import { Box, Flex, Text } from 'rebass'
 
+import { Rarity } from './types'
 import {
   originalCreatureMap,
   convertNumberToTime,
@@ -21,38 +23,24 @@ import { HemispheresContext } from './hemispheres-context'
 import { MonthsContext } from './months-context'
 import { SortFieldContext } from './sort-field-context'
 
-const Container = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  row-gap: 24px;
-  column-gap: 12px;
-
-  @media (max-width: 850px) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-`
-
-const CreatureName = styled.h2`
-  margin: 0 0 8px;
-  text-transform: capitalize;
-  text-decoration: underline;
-`
-
-const CreatureCard = styled.div`
-  border: 1px solid;
-  /* margin-bottom: 16px; */
-  padding: 8px;
-  border-radius: 2px;
-  /* box-shadow: 1px 1px #888; */
-`
-
-const Label = styled.span`
-  font-weight: bold;
-`
+const Container = ({ children }: { children: React.ReactNode }) => (
+  <Box
+    display="grid"
+    sx={{
+      gridTemplateColumns: '1fr 1fr 1fr',
+      rowGap: 24,
+      columnGap: 12,
+      '@media (max-width: 850px)': {
+        gridTemplateColumns: '1fr 1fr',
+      },
+      '@media (max-width: 600px)': {
+        gridTemplateColumns: '1fr',
+      },
+    }}
+  >
+    {children}
+  </Box>
+)
 
 function getTimeDisplay(time: number[]): string {
   const startTime = convertNumberToTime(time[0])
@@ -93,36 +81,57 @@ export default function Creatures() {
           name,
           price,
         }) => (
-          <CreatureCard key={id}>
-            <CreatureName>{name}</CreatureName>
+          <Box key={id} p={2} sx={{ border: '1px solid', borderRadius: '2px' }}>
+            <Box mb={2}>
+              <Text
+                fontWeight="bold"
+                fontSize={4}
+                sx={{ textTransform: 'capitalize', textDecoration: 'underline' }}
+              >
+                {name}
+              </Text>
+            </Box>
             <div>
-              <div>
-                <Label>Price: </Label>
-                <span>{price}</span>
-              </div>
-              <div>
-                <Label>Location: </Label>
-                <span>{location}</span>
-              </div>
-              <div>
-                <Label>Months (Northern Hemisphere): </Label>
-                <span>{isAllYear ? 'All year' : getMonthRanges(monthNorthern).join(', ')}</span>
-              </div>
-              <div>
-                <Label>Months (Southern Hemisphere): </Label>
-                <span>{isAllYear ? 'All year' : getMonthRanges(monthSouthern).join(', ')}</span>
-              </div>
-              <div>
-                <Label>Time: </Label>
-                <span>{isAllDay ? 'All day' : getTimeDisplay(time)}</span>
-              </div>
-              <div>
-                <Label>Rarity: </Label>
-                {/** TODO: fix ultra-rare (it shows up as Ultra-rare) */}
-                <span>{rarity}</span>
-              </div>
+              <Flex alignItems="center" mb={2}>
+                <Flex mr={1}>
+                  <DollarSign size={20} />
+                </Flex>
+                <Text>{price}</Text>
+              </Flex>
+              <Flex alignItems="center" mb={2}>
+                <Flex mr={1}>
+                  <Map size={20} />
+                </Flex>
+                <Text>{location}</Text>
+              </Flex>
+              <Flex alignItems="center" mb={2}>
+                <Flex>
+                  <Calendar size={20} />
+                </Flex>
+                <Text fontWeight="bold">(N)</Text>
+                <Text>{isAllYear ? 'All year' : getMonthRanges(monthNorthern).join(', ')}</Text>
+              </Flex>
+              <Flex alignItems="center" mb={2}>
+                <Flex>
+                  <Calendar size={20} />
+                </Flex>
+                <Text fontWeight="bold">(S)</Text>
+                <Text>{isAllYear ? 'All year' : getMonthRanges(monthSouthern).join(', ')}</Text>
+              </Flex>
+              <Flex alignItems="center" mb={2}>
+                <Flex mr={1}>
+                  <Clock size={20} />
+                </Flex>
+                <Text>{isAllDay ? 'All day' : getTimeDisplay(time)}</Text>
+              </Flex>
+              <Flex alignItems="center" mb={2}>
+                <Flex mr={1}>
+                  <Gift size={20} />
+                </Flex>
+                <Text>{Object.values(Rarity)[Object.keys(Rarity).indexOf(rarity)]}</Text>
+              </Flex>
             </div>
-          </CreatureCard>
+          </Box>
         )
       )}
     </Container>

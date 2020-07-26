@@ -57,25 +57,25 @@ export enum Hemisphere {
 
 export const Month = [
   '--',
-  'January',
-  'February',
-  'March',
-  'April',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
   'May',
   'June',
   'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
+  'Aug',
+  'Sept',
+  'Oct',
+  'Nov',
+  'Dec',
 ]
 
 export enum Rarity {
-  Common = 1,
-  Uncommon,
-  Rare,
-  'Ultra-rare',
+  Common = 'Common',
+  Uncommon = 'Uncommon',
+  Rare = 'Rare',
+  UltraRare = 'Ultra Rare',
 }
 
 export type Location = BugLocation | FishLocation

@@ -1,43 +1,44 @@
 import React, { useContext } from 'react'
-import styled from 'styled-components'
+import { Flex } from 'rebass'
+import { Label, Radio } from '@rebass/forms'
 
 import { Hemisphere } from './types'
 import { HemispheresContext } from './hemispheres-context'
-
-const Container = styled.div`
-  justify-self: center;
-
-  @media (max-width: 600px) {
-    justify-self: unset;
-  }
-`
 
 export default function Hemispheres() {
   const { hemisphere, setHemisphere } = useContext(HemispheresContext)
 
   return (
-    <Container>
-      <span>Hemisphere:</span>
+    <Flex
+      justifySelf="center"
+      flexDirection="column"
+      sx={{
+        '@media (max-width: 600px)': {
+          justifySelf: 'unset',
+        },
+      }}
+    >
+      <Label>Hemisphere:</Label>
       <div>
-        <div>
-          <input
+        <Label alignItems="center">
+          <Radio
             type="radio"
             onChange={() => setHemisphere(Hemisphere.North)}
             value={Hemisphere.North}
             checked={hemisphere === Hemisphere.North}
           />
-          <label>Northern</label>
-        </div>
-        <div>
-          <input
+          Northern
+        </Label>
+        <Label alignItems="center">
+          <Radio
             type="radio"
             onChange={() => setHemisphere(Hemisphere.South)}
             value={Hemisphere.South}
             checked={hemisphere === Hemisphere.South}
           />
-          <label>Southern</label>
-        </div>
+          Southern
+        </Label>
       </div>
-    </Container>
+    </Flex>
   )
 }

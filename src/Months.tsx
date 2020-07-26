@@ -1,20 +1,9 @@
 import React, { useContext } from 'react'
-import styled from 'styled-components'
+import { Box, Flex, Text } from 'rebass'
+import { Label, Checkbox, Select } from '@rebass/forms'
 
 import { Month } from './types'
 import { MonthsContext } from './months-context'
-
-const Container = styled.div`
-  justify-self: end;
-
-  @media (max-width: 600px) {
-    justify-self: unset;
-  }
-`
-
-const AllYear = styled.span`
-  margin-right: 8px;
-`
 
 export default function Months() {
   const { allYear, startMonth, endMonth, setAllYear, setStartMonth, setEndMonth } = useContext(
@@ -42,26 +31,36 @@ export default function Months() {
   }
 
   return (
-    <Container>
+    <Flex
+      justifySelf="end"
+      flexDirection="column"
+      sx={{
+        '@media (max-width: 600px)': {
+          justifySelf: 'unset',
+        },
+      }}
+    >
       <div>
-        <span>Months: </span>
+        <Label>Months: </Label>
         <div>
-          <div>
-            <span>
-              <input type="checkbox" onChange={handleAllYearCheckboxChange} />
-              <AllYear>All Year</AllYear>
-            </span>
-          </div>
-          <div>
-            <select value={startMonth || ''} onChange={handleStartMonthChange} disabled={allYear}>
+          <Flex>
+            <Label alignItems="center">
+              <Checkbox type="checkbox" onChange={handleAllYearCheckboxChange} />
+              All Year
+            </Label>
+          </Flex>
+          <Flex alignItems="center">
+            <Select value={startMonth || ''} onChange={handleStartMonthChange} disabled={allYear}>
               {Month.map((month, index) => (
                 <option key={month} value={index}>
                   {month}
                 </option>
               ))}
-            </select>
-            <span> - </span>
-            <select
+            </Select>
+            <Box mx={3}>
+              <Text>-</Text>
+            </Box>
+            <Select
               value={endMonth || ''}
               onChange={(event) => setEndMonth(parseInt(event.target.value))}
               disabled={!startMonth}
@@ -71,10 +70,10 @@ export default function Months() {
                   {month}
                 </option>
               ))}
-            </select>
-          </div>
+            </Select>
+          </Flex>
         </div>
       </div>
-    </Container>
+    </Flex>
   )
 }
