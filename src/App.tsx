@@ -16,22 +16,19 @@ import './App.css'
 
 const AppContainer = ({ children }: { children: React.ReactNode }) => (
   <Box
-    display="grid"
+    display={['flex', 'grid']}
     width={1}
     height="100%"
     px="4vw"
     py="2vh"
     overflow="hidden"
     sx={{
+      position: 'relative',
       gridTemplateRows: 'repeat(3, auto)',
       gridTemplateAreas: "'top' 'filters' 'content'",
       rowGap: 16,
       columnGap: 24,
-      '@media (max-width: 600px)': {
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-      },
+      flexDirection: ['column', null],
     }}
   >
     {children}
@@ -53,14 +50,11 @@ const Top = ({ children }: { children: React.ReactNode }) => (
 
 const Filters = ({ children }: { children: React.ReactNode }) => (
   <Box
-    display="grid"
+    display={['unset', 'grid']}
     sx={{
       gridArea: 'filters',
       gridTemplateColumns: 'repeat(4, 1fr)',
       columnGap: 24,
-      '@media (max-width: 600px)': {
-        display: 'unset',
-      },
     }}
   >
     {children}
@@ -70,11 +64,9 @@ const Filters = ({ children }: { children: React.ReactNode }) => (
 const Content = ({ children }: { children: React.ReactNode }) => (
   <Box
     overflow="auto"
+    height={['calc(100% - 108px)', 'unset']}
     sx={{
       gridArea: 'content',
-      '@media (max-width: 600px)': {
-        height: 'calc(100% - 108px)',
-      },
     }}
   >
     {children}
@@ -86,7 +78,11 @@ export default function App() {
   const [isBottomFiltersOpen, setIsBottomFiltersOpen] = useState(false)
 
   const handleResize = () => {
-    setIsSmallViewport(window.innerWidth <= 600)
+    const isSmallViewport = window.innerWidth <= 600
+    setIsSmallViewport(isSmallViewport)
+    if (!isSmallViewport) {
+      setIsBottomFiltersOpen(false)
+    }
   }
 
   useEffect(() => {
@@ -121,7 +117,7 @@ export default function App() {
         isSmallViewport={isSmallViewport}
         setIsBottomFiltersOpen={setIsBottomFiltersOpen}
       />
-      <BottomFilters isBottomFiltersOpen={isBottomFiltersOpen} />
+      <BottomFilters isBottomFiltersOpen={isBottomFiltersOpen} isSmallViewport={isSmallViewport} />
     </AppContainer>
   )
 }

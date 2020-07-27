@@ -4,6 +4,9 @@ import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
+import { ThemeProvider } from 'theme-ui'
+import theme from './theme'
+
 import { SearchInputContextProvider } from './search-input-context'
 import { ListViewContextProvider } from './list-view-context'
 import { LocationsContextProvider } from './locations-context'
@@ -14,21 +17,23 @@ import { SortFieldContextProvider } from './sort-field-context'
 
 ReactDOM.render(
   <React.StrictMode>
-    <SearchInputContextProvider>
-      <LocationsContextProvider>
-        <TimeContextProvider>
-          <HemispheresContextProvider>
-            <MonthsContextProvider>
-              <SortFieldContextProvider>
-                <ListViewContextProvider>
-                  <App />
-                </ListViewContextProvider>
-              </SortFieldContextProvider>
-            </MonthsContextProvider>
-          </HemispheresContextProvider>
-        </TimeContextProvider>
-      </LocationsContextProvider>
-    </SearchInputContextProvider>
+    <ThemeProvider theme={theme}>
+      <SearchInputContextProvider>
+        <LocationsContextProvider>
+          <TimeContextProvider>
+            <HemispheresContextProvider>
+              <MonthsContextProvider>
+                <SortFieldContextProvider>
+                  <ListViewContextProvider>
+                    <App />
+                  </ListViewContextProvider>
+                </SortFieldContextProvider>
+              </MonthsContextProvider>
+            </HemispheresContextProvider>
+          </TimeContextProvider>
+        </LocationsContextProvider>
+      </SearchInputContextProvider>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )

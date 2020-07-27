@@ -27,15 +27,9 @@ const Container = ({ children }: { children: React.ReactNode }) => (
   <Box
     display="grid"
     sx={{
-      gridTemplateColumns: '1fr 1fr 1fr',
+      gridTemplateColumns: ['1fr', '1fr 1fr', 'repeat(3, 1fr)', 'repeat(4, 1fr)'],
       rowGap: 24,
       columnGap: 12,
-      '@media (max-width: 850px)': {
-        gridTemplateColumns: '1fr 1fr',
-      },
-      '@media (max-width: 600px)': {
-        gridTemplateColumns: '1fr',
-      },
     }}
   >
     {children}
@@ -82,8 +76,13 @@ export default function Creatures() {
           fileName,
           price,
         }) => (
-          <Box key={id} px={3} pt={1} pb={2} sx={{ border: '1px solid', borderRadius: '2px' }}>
-            <Flex alignItems="center" justifyContent="space-between">
+          <Box
+            key={id}
+            px={3}
+            py={2}
+            sx={{ position: 'relative', border: '1px solid', borderRadius: '2px' }}
+          >
+            <Flex mb={2} alignItems="center" justifyContent="space-between">
               <Text
                 fontWeight="bold"
                 fontSize={4}
@@ -91,13 +90,8 @@ export default function Creatures() {
               >
                 {name}
               </Text>
-              <Image
-                src={`${process.env.PUBLIC_URL}/icons/${listView}/${fileName}.png`}
-                alt={name}
-                sx={{ width: '56px' }}
-              />
             </Flex>
-            <div>
+            <Box>
               <Flex alignItems="center" mb={2}>
                 <Flex mr={1}>
                   <DollarSign size={20} />
@@ -136,7 +130,14 @@ export default function Creatures() {
                 </Flex>
                 <Text>{Object.values(Rarity)[Object.keys(Rarity).indexOf(rarity)]}</Text>
               </Flex>
-            </div>
+            </Box>
+            <Box sx={{ position: 'absolute', right: 3, bottom: 0 }}>
+              <Image
+                src={`${process.env.PUBLIC_URL}/icons/${listView}/${fileName}.png`}
+                alt={name}
+                sx={{ width: '56px' }}
+              />
+            </Box>
           </Box>
         )
       )}

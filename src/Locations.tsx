@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
-import { Flex } from 'rebass'
-import { Label, Select } from '@rebass/forms'
+import { Flex, Text } from 'rebass'
+import { Select } from '@rebass/forms'
 
 import { BugLocation, FishLocation, ListView, Location } from './types'
 import { LocationsContext } from './locations-context'
@@ -15,7 +15,7 @@ export default function Locations() {
 
   return (
     <Flex flexDirection="column">
-      <Label>Location: </Label>
+      <Text fontWeight="bold">Location: </Text>
       <Select value={location} onChange={(event) => setLocation(event.target.value as Location)}>
         {locations.map((location: Location) => (
           <option key={location}>{location}</option>

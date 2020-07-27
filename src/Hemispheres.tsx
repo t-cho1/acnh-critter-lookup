@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Flex } from 'rebass'
+import { Flex, Text } from 'rebass'
 import { Label, Radio } from '@rebass/forms'
 
 import { Hemisphere } from './types'
@@ -9,16 +9,8 @@ export default function Hemispheres() {
   const { hemisphere, setHemisphere } = useContext(HemispheresContext)
 
   return (
-    <Flex
-      justifySelf="center"
-      flexDirection="column"
-      sx={{
-        '@media (max-width: 600px)': {
-          justifySelf: 'unset',
-        },
-      }}
-    >
-      <Label>Hemisphere:</Label>
+    <Flex justifySelf={['unset', 'center']} flexDirection="column">
+      <Text fontWeight="bold">Hemisphere:</Text>
       <div>
         <Label alignItems="center">
           <Radio

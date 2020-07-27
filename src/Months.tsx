@@ -31,17 +31,9 @@ export default function Months() {
   }
 
   return (
-    <Flex
-      justifySelf="end"
-      flexDirection="column"
-      sx={{
-        '@media (max-width: 600px)': {
-          justifySelf: 'unset',
-        },
-      }}
-    >
+    <Flex justifySelf={['unset', 'end']} flexDirection="column">
       <div>
-        <Label>Months: </Label>
+        <Text fontWeight="bold">Months: </Text>
         <div>
           <Flex>
             <Label alignItems="center">

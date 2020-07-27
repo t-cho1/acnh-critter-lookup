@@ -31,16 +31,8 @@ export default function Time() {
   }
 
   return (
-    <Flex
-      justifySelf="center"
-      flexDirection="column"
-      sx={{
-        '@media (max-width: 600px)': {
-          justifySelf: 'unset',
-        },
-      }}
-    >
-      <span>Time: </span>
+    <Flex justifySelf={['unset', 'center']} flexDirection="column">
+      <Text fontWeight="bold">Time: </Text>
       <Label alignItems="center">
         <Checkbox onChange={handleAllDayCheckboxChange} />
         All Day

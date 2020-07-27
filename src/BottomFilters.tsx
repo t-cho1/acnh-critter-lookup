@@ -8,10 +8,11 @@ import Months from './Months'
 
 interface IProps {
   isBottomFiltersOpen: boolean
+  isSmallViewport: boolean
 }
 
-export default function BottomFilters({ isBottomFiltersOpen }: IProps) {
-  if (!isBottomFiltersOpen) {
+export default function BottomFilters({ isBottomFiltersOpen, isSmallViewport }: IProps) {
+  if (!isBottomFiltersOpen || !isSmallViewport) {
     return null
   }
 
@@ -19,13 +20,13 @@ export default function BottomFilters({ isBottomFiltersOpen }: IProps) {
     <Box
       display="grid"
       p={2}
-      backgroundColor="white"
+      backgroundColor="background"
       sx={{
         position: 'absolute',
         bottom: '108px',
         left: 2,
         right: 2,
-        border: '2px dashed black',
+        border: '2px dashed',
         borderRadius: '2px',
         gridTemplateColumns: '1fr 1fr',
         gridTemplateRows: '1fr 1fr',
