@@ -24,7 +24,7 @@ const AppContainer = ({ children }: { children: React.ReactNode }) => (
     overflow="hidden"
     sx={{
       position: 'relative',
-      gridTemplateRows: 'repeat(3, auto)',
+      gridTemplateRows: 'min-content min-content auto',
       gridTemplateAreas: "'top' 'filters' 'content'",
       rowGap: 16,
       columnGap: 24,
